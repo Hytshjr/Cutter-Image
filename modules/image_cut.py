@@ -145,7 +145,7 @@ class Editor():
         self.root           = root
         self.path           = path
         self.imagen_count   = img_count
-    
+
 
     def cut_image(self):
         def mouse_track(event,x,y,flags,param):
@@ -161,26 +161,26 @@ class Editor():
                 if flags > 0:
                     img_pos -= 50  # Ajusta la cantidad de desplazamiento Arriba
 
-                
+
             if event == cv2.EVENT_MOUSEWHEEL:
                 if flags < 0:
-                    img_pos += 50     # Ajusta la cantidad de desplazamiento 
+                    img_pos += 50     # Ajusta la cantidad de desplazamiento
 
 
             if count == 0:
                 if event == cv2.EVENT_LBUTTONDOWN:
-                    rect_pts = [(x, y)]  
+                    rect_pts = [(x, y)]
 
                     rect_pts.append((size_img[1],0))  #Estos son el ancho "size_img[1]" y el 0 es el top(la primera altura de la imagen)
                     rect_pts[0] = (0,rect_pts[0][1]+img_pos) #Estos son el inicio lateral de la imagen y la parte mas baja que seleccionamos
 
                     cv2.rectangle(imagen, rect_pts[0], rect_pts[1], (0, 255, 0))
-        
+
                     pxl_save.append((0,rect_pts[0][1]))
 
-                    count += 1 
-                    
-                
+                    count = 0
+
+
             else:
                 if event == cv2.EVENT_LBUTTONDOWN:
                     bottom_size = rect_pts[0][1] #Esto guarda la altura de la linea anterior y lo usa como tope para esta

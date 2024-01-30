@@ -7,7 +7,7 @@ import tkinter as tk
 
 # Acces to environment variable from .env
 API_KEY = config('API_KEY')
-editor = Editor()
+img_user = Editor()
 
 class Frame(tk.Frame):
     def __init__(self, root=None):
@@ -17,7 +17,7 @@ class Frame(tk.Frame):
         self.config(width=480, height=320, bg='#23606E')
         self.campos_rellenar()
 
-    
+
     def campos_rellenar(self):
         self.create_api_section()
         self.create_buttons()
@@ -49,7 +49,7 @@ class Frame(tk.Frame):
         self.boton_replpace.grid(row=1, column=1, pady=3)
 
         #Este boton recorte la imagen
-        self.boton_replpace = tk.Button(self, text='Recortar imagen', command=editor.cut_image)
+        self.boton_replpace = tk.Button(self, text='Recortar imagen', command=img_user.cut_image)
         self.boton_replpace.config(font = ('Helvetica',10,'bold'), width=40, border=0, fg='#23606E', bg='#FACFCE')
         self.boton_replpace.grid(row=2, column=0, pady=3, columnspan=2)
 
