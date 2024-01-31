@@ -11,7 +11,6 @@ class Editor:
         self.img = None
         self.img_siz = (0, 0)
         self.pxl_save = []
-        self.img_pos = 0
         self.count = 0
 
 
@@ -31,18 +30,22 @@ class Editor:
 
     def _select_name(self):
         self.name = os.path.basename(self.path)
-
+        print(self.name)
 
     def _rename_file(self):
         directory, filename = os.path.split(self.path)
         name, extension = os.path.splitext(filename)
-        new_path = os.path.join(directory, name + extension)
+        new_path = os.path.join(directory, self.name + extension)
+
 
         try:
             os.rename(self.path, new_path)
             self.path = new_path
+            print(new_path)
         except Exception as e:
-            print(f"Error al renombrar el archivo: {e}")
+            MessageBox.showwarning(
+                "Error",
+                f"Error al renombrar el archivo: {e}")
 
 
     def _load_image(self):
@@ -56,10 +59,11 @@ class Editor:
 
 
     def _show_image_info(self):
-        MessageBox.showwarning(
-            "Tamaño",
-            f"La altura es de: {self.img_siz[0]} y el ancho es de {self.img_siz[1]}"
-        )
+        if self.img_siz[1] != 600:
+            MessageBox.showwarning(
+                "Tamaño",
+                f"La altura es de: {self.img_siz[0]} y el ancho es de {self.img_siz[1]}"
+            )
 
 
     def _show_image(self):
