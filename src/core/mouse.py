@@ -49,13 +49,11 @@ class MouseTracker:
     def _rect_pts(self):
         if self.img_pos == 0:
             height_slct = (0,self.y)
-            with_slct = (self.imgsize[0],0)
-            return (height_slct,with_slct)
-
         else:
             height_slct = (0,self.y+self.img_pos)
-            with_slct = (self.imgsize[0],0)
-            return (height_slct,with_slct)
+
+        with_slct = (self.imgsize[0],0)
+        return (height_slct, with_slct)
 
 # def mouse_track(event,x,y,flags,param):
 #     from gui.main_window import img_user
