@@ -1,5 +1,5 @@
 from tkinter import messagebox as MessageBox
-from core.mouse import mouse_track
+from core.mouse import MouseTrack
 from tkinter import filedialog
 import cv2
 import os
@@ -18,7 +18,6 @@ class Editor:
     def cut_image(self):
         self.path = filedialog.askopenfilename()
 
-
         if not self.path:
             return
 
@@ -27,7 +26,7 @@ class Editor:
         self._load_image()
         self._show_image_info()
         self._show_image()
-        # self._set_mouse_callback()
+        self._set_mouse_callback()
 
 
     def _select_name(self):
@@ -48,7 +47,6 @@ class Editor:
 
     def _load_image(self):
         try:
-            print(self.path)
             self.img = cv2.imread(self.path)
             self.img_siz = self.img.shape
         except Exception as e:
@@ -67,3 +65,7 @@ class Editor:
     def _show_image(self):
         cv2.imshow(self.name, self.img)
 
+
+    def _set_mouse_callback(self):
+        tracker = MouseTrack()
+        cv2.setMouseCallback(self.name, tracker.main_track)
