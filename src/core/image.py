@@ -1,5 +1,5 @@
 from tkinter import messagebox as MessageBox
-from core.mouse import MouseTrack
+from core.mouse import MouseTracker
 from tkinter import filedialog
 import cv2
 import os
@@ -70,5 +70,5 @@ class Editor:
 
 
     def _set_mouse_callback(self):
-        tracker = MouseTrack()
+        tracker = MouseTracker(self.img, self.name)
         cv2.setMouseCallback(self.name, tracker.main_track)

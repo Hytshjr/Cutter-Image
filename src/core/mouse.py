@@ -1,19 +1,21 @@
 import cv2
 
-class MouseTrack:
-    def __init__(self):
-        from gui.main_window import img_user
-        self.img = img_user.img
-        self.name = img_user.name
+class MouseTracker:
+    def __init__(self, image, name):
+        self.img = image
+        self.name = name
         self.img_pos = 0
+        self.imgsize = image.shape
 
 
     def main_track(self,event,x,y,flags, param):
 
         self._set_var(event, x, y, flags)
         self._scroll_track()
+        self._click_track()
 
-        cv2.imshow(self.name, self.img[self.img_pos:self.img_pos+1080,:])
+
+        cv2.imshow(self.name,self.img[self.img_pos:self.img_pos+1080,:])
 
 
     def _set_var(self,event, x, y, flags):
@@ -31,18 +33,29 @@ class MouseTrack:
                 self.img_pos += 50
 
 
-    # def _click_track(self):
-    #     if self.event == cv2.EVENT_LBUTTONDOWN:
-    #         rect_pts = [(self.x, self.y)]
+    def _click_track(self):
+        if self.event == cv2.EVENT_LBUTTONDOWN:
 
-    #         rect_pts.append((size_img[1],0))
-    #         rect_pts[0] = (0,rect_pts[0][1]+pos)
+            rect_pts = self._rect_pts()
 
-    #         cv2.rectangle(img, rect_pts[0], rect_pts[1], (0, 255, 0))
+            cv2.rectangle(
+                self.img,
+                rect_pts[0],
+                rect_pts[1],
+                (0, 255, 0)
+                )
 
-            # img_user.pxl_save.append((0,rect_pts[0][1]))
-            # img_user.count += 1
 
+    def _rect_pts(self):
+        if self.img_pos == 0:
+            height_slct = (0,self.y)
+            with_slct = (self.imgsize[0],0)
+            return (height_slct,with_slct)
+
+        else:
+            height_slct = (0,self.y+self.img_pos)
+            with_slct = (self.imgsize[0],0)
+            return (height_slct,with_slct)
 
 # def mouse_track(event,x,y,flags,param):
 #     from gui.main_window import img_user
