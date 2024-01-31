@@ -21,6 +21,8 @@ class Editor:
             return
 
         self._select_name()
+        self._handle_errors(self._rename_file)
+        self._handle_errors(self._load_image)
         self._rename_file()
         self._load_image()
         self._show_image_info()
@@ -35,26 +37,13 @@ class Editor:
     def _rename_file(self):
         directory, filename = os.path.split(self.path)
         extension = os.path.splitext(filename)[1]
-        new_path = os.path.join(directory, self.name + extension)
-
-
-        try:
-            os.rename(self.path, new_path)
-            self.path = new_path
-        except Exception as e:
-            MessageBox.showwarning(
-                "Error",
-                f"Error al renombrar el archivo: {e}")
-
+        new_path = os.path.join(directory, f"{self.name}{extension}")
+        os.rename(self.path, new_path)
+        self.path = new_path
 
     def _load_image(self):
-        try:
-            self.img = cv2.imread(self.path)
-            self.img_siz = self.img.shape
-        except Exception as e:
-            MessageBox.showwarning(
-                "Error",
-                f"Error loading image: {e}")
+        self.img = cv2.imread(self.path)
+        self.img_siz = self.img.shape
 
 
     def _show_image_info(self):
@@ -65,10 +54,25 @@ class Editor:
             )
 
 
-    def _show_image(self):
-        cv2.imshow(self.name, self.img)
+    def _show_image(self, img=None):
+        if img is None:
+            cv2.imshow(self.name, self.img)
+        else:
+            cv2.imshow(self.name, img)
 
 
     def _set_mouse_callback(self):
-        tracker = MouseTracker(self.img, self.name)
+        tracker = MouseTracker(self)
         cv2.setMouseCallback(self.name, tracker.main_track)
+
+
+    def _handle_errors(self, func):
+        try:
+            func()
+        except FileNotFoundError as e:
+            self._show_error(f"FileNotFoundError: {e}")
+        except cv2.error as e:
+            self._show_error(f"cv2.error: {e}")
+
+    def _show_error(self, message):
+        MessageBox.showwarning("Error", f"Error: {message}")

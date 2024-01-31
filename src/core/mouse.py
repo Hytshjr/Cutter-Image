@@ -1,59 +1,70 @@
 import cv2
 
 class MouseTracker:
-    def __init__(self, image, name):
-        self.img = image
-        self.name = name
+    def __init__(self, editor_instance):
+        self.editor = editor_instance
         self.img_pos = 0
-        self.imgsize = image.shape
+        self.img = self.editor.img
+        self.imgsize = self.img.shape
+        self.img_show = self.editor.img
+        self.coords = {}
 
 
     def main_track(self,event,x,y,flags, param):
-
-        self._set_var(event, x, y, flags)
-        self._scroll_track()
-        self._click_track()
-
-
-        cv2.imshow(self.name,self.img[self.img_pos:self.img_pos+1080,:])
+        if event == 0:
+            return
+        self._scroll_track(event, flags)
+        self._click_track(event, y)
 
 
-    def _set_var(self,event, x, y, flags):
-        self.x = x
-        self.y = y
-        self.event = event
-        self.flags = flags
-
-
-    def _scroll_track(self):
-        if self.event == cv2.EVENT_MOUSEWHEEL:
-            if self.flags > 0:
+    def _scroll_track(self, event, flags):
+        if event == cv2.EVENT_MOUSEWHEEL:
+            if flags > 0:
                 self.img_pos -= 50
             else:
                 self.img_pos += 50
 
+            self.img_show = self._img_show(self.img_pos)
+            self.editor._show_image(self.img_show)
 
-    def _click_track(self):
-        if self.event == cv2.EVENT_LBUTTONDOWN:
 
-            rect_pts = self._rect_pts()
+    def _click_track(self,event, y):
+        if event == cv2.EVENT_LBUTTONDOWN:
+            color = (0, 255, 0)
+            self._rect_pts(y)
 
             cv2.rectangle(
                 self.img,
-                rect_pts[0],
-                rect_pts[1],
-                (0, 255, 0)
+                self.coords['height'],
+                self.coords['witdh'],
+                color
                 )
 
+            self.editor._show_image(self.img_show)
 
-    def _rect_pts(self):
+
+            print(self.coords['height'])
+            print(self.coords['witdh'])
+
+            immg = self.img[self.coords['height'][0]:self.coords['height'][1],:]
+            cv2.imshow('test',immg)
+
+
+    def _img_show(self, position):
+        pos_top = position
+        pos_bottom = position+1080
+        return self.img[pos_top:pos_bottom,:]
+
+
+
+    def _rect_pts(self, y):
         if self.img_pos == 0:
-            height_slct = (0,self.y)
+            self.coords['height'] = (0,y)
         else:
-            height_slct = (0,self.y+self.img_pos)
+            self.coords['height'] = (0,y+self.img_pos)
 
-        with_slct = (self.imgsize[0],0)
-        return (height_slct, with_slct)
+        self.coords['witdh']=(self.imgsize[1],0)
+
 
 # def mouse_track(event,x,y,flags,param):
 #     from gui.main_window import img_user
