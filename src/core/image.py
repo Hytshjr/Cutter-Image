@@ -29,19 +29,18 @@ class Editor:
 
 
     def _select_name(self):
-        self.name = os.path.basename(self.path)
-        print(self.name)
+        self.name = os.path.basename(os.path.dirname(self.path))
+
 
     def _rename_file(self):
         directory, filename = os.path.split(self.path)
-        name, extension = os.path.splitext(filename)
+        extension = os.path.splitext(filename)[1]
         new_path = os.path.join(directory, self.name + extension)
 
 
         try:
             os.rename(self.path, new_path)
             self.path = new_path
-            print(new_path)
         except Exception as e:
             MessageBox.showwarning(
                 "Error",

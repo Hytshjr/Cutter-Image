@@ -31,6 +31,19 @@ class MouseTrack:
                 self.img_pos += 50
 
 
+    # def _click_track(self):
+    #     if self.event == cv2.EVENT_LBUTTONDOWN:
+    #         rect_pts = [(self.x, self.y)]
+
+    #         rect_pts.append((size_img[1],0))
+    #         rect_pts[0] = (0,rect_pts[0][1]+pos)
+
+    #         cv2.rectangle(img, rect_pts[0], rect_pts[1], (0, 255, 0))
+
+            # img_user.pxl_save.append((0,rect_pts[0][1]))
+            # img_user.count += 1
+
+
 # def mouse_track(event,x,y,flags,param):
 #     from gui.main_window import img_user
 
