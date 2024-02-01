@@ -3,113 +3,75 @@ import cv2
 class MouseTracker:
     def __init__(self, editor_instance):
         self.editor = editor_instance
-        self.img_pos = 0
         self.img = self.editor.img
-        self.imgsize = self.img.shape
-        self.img_show = self.editor.img
+        self.width = self.img.shape[1]
+        self.height = self.img.shape[0]
+        self.img_pos = 0
+        self.last_height = 0
         self.coords = {}
+        self.save_pxl = []
 
 
-    def main_track(self,event,x,y,flags, param):
-        if event == 0:
-            return
-        self._scroll_track(event, flags)
-        self._click_track(event, y)
-
-
-    def _scroll_track(self, event, flags):
+    def main_track(self, event, eje_x, eje_y, flags, param):
         if event == cv2.EVENT_MOUSEWHEEL:
-            if flags > 0:
-                self.img_pos -= 50
-            else:
-                self.img_pos += 50
+            self._handle_scroll_event(flags)
+        elif event == cv2.EVENT_LBUTTONDOWN:
+            self._handle_click_event(eje_y)
 
-            self.img_show = self._img_show(self.img_pos)
-            self.editor._show_image(self.img_show)
+    def _handle_scroll_event(self, flags):
+        if flags > 0:
+            self.img_pos -= 50
+        else:
+            self.img_pos += 50
 
-
-    def _click_track(self,event, y):
-        if event == cv2.EVENT_LBUTTONDOWN:
-            color = (0, 255, 0)
-            self._rect_pts(y)
-
-            cv2.rectangle(
-                self.img,
-                self.coords['height'],
-                self.coords['witdh'],
-                color
-                )
-
-            self.editor._show_image(self.img_show)
+        self._show_image(self.img_pos, self.img)
 
 
-            print(self.coords['height'])
-            print(self.coords['witdh'])
+    def _handle_click_event(self, eje_y):
+        self._rect_pts(eje_y)
+        self._set_coords(eje_y)
+        self._create_rectangle()
+        self._show_image(self.img_pos, self.img)
+        self._save_pxl()
+        self._last_height()
 
-            immg = self.img[self.coords['height'][0]:self.coords['height'][1],:]
-            cv2.imshow('test',immg)
+
+    def _rect_pts(self, eje_y):
+        if self.img_pos == 0:
+            self.coords['height'] = (0,eje_y)
+        else:
+            self.coords['height'] = (0,eje_y+self.img_pos)
 
 
-    def _img_show(self, position):
+    def _set_coords(self, eje_y):
+        self.coords['witdh'] = (self.width,self.last_height)
+        self.coords['top_rtngl'] = self.last_height
+        self.coords['bottom_rtngl'] = eje_y+self.img_pos
+
+
+    def _create_rectangle(self):
+        color = (0, 255, 0)
+        cv2.rectangle(
+            self.img, self.coords['height'],
+            self.coords['witdh'], color)
+
+
+    def _show_image(self, position, img):
         pos_top = position
         pos_bottom = position+1080
-        return self.img[pos_top:pos_bottom,:]
+        self.editor._show_image(img[pos_top:pos_bottom:])
+
+
+    def _save_pxl(self):
+        self.save_pxl.append(
+            (self.coords['top_rtngl'],
+            self.coords['bottom_rtngl']))
+
+
+    def _last_height(self):
+        self.last_height = self.coords['height'][1]
 
 
 
-    def _rect_pts(self, y):
-        if self.img_pos == 0:
-            self.coords['height'] = (0,y)
-        else:
-            self.coords['height'] = (0,y+self.img_pos)
-
-        self.coords['witdh']=(self.imgsize[1],0)
-
-
-# def mouse_track(event,x,y,flags,param):
-#     from gui.main_window import img_user
-
-#     img      = img_user.img
-#     name     = img_user.name
-#     pos      = img_user.img_pos
-#     size_img = img.shape
-#     save_pxl = img_user.pxl_save
-
-
-#     if event == cv2.EVENT_MOUSEWHEEL:
-#         if flags > 0:
-#             img_user.img_pos -= 50
-
-#     if event == cv2.EVENT_MOUSEWHEEL:
-#         if flags < 0:
-#             img_user.img_pos += 50
-
-#     cv2.imshow(name, img[pos:pos+1080,:])
-
-    # if event == cv2.EVENT_LBUTTONDOWN:
-    #     rect_pts = [(x, y)]
-
-    #     rect_pts.append((size_img[1],0))
-    #     rect_pts[0] = (0,rect_pts[0][1]+pos)
-
-    #     cv2.rectangle(img, rect_pts[0], rect_pts[1], (0, 255, 0))
-
-    #     img_user.pxl_save.append((0,rect_pts[0][1]))
-    #     img_user.count += 1
-
-    # else:
-    #     if event == cv2.EVENT_LBUTTONDOWN:
-    #         bottom_size = rect_pts[0][1]
-    #         rect_pts[1] = (size_img[1],bottom_size)
-
-    #         rect_pts[0] = (x, y)
-    #         rect_pts[0] = (0,rect_pts[0][1]+pos)
-    #         rect_pts[1] = (size_img[1],bottom_size)
-
-    #         cv2.rectangle(img, rect_pts[0], rect_pts[1], (0, 255, 0))
-
-    #         img_user.pxl_save.append((bottom_size,rect_pts[0][1]))
-
-    #         count += 1
 
 
