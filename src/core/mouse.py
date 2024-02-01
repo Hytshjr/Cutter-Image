@@ -19,6 +19,8 @@ class MouseTracker:
             self._handle_scroll_event(flags)
         elif event == cv2.EVENT_LBUTTONDOWN:
             self._handle_click_event(eje_y)
+        elif event == cv2.EVENT_RBUTTONDOWN:
+            self._handle_right_click_event(eje_y, eje_x)
 
 
     def _handle_scroll_event(self, flags):
@@ -30,27 +32,39 @@ class MouseTracker:
 
     def _handle_click_event(self, eje_y):
         # Handle left mouse button click event
-        self._rect_pts(eje_y)
-        self._set_coords(eje_y)
+        self._set_height(eje_y)
+        self._set_coords(eje_y, self.width)
         self._create_rectangle()
         self._show_image(self.img_pos, self.img)
         self._save_pxl()
         self._last_height()
 
 
-    def _rect_pts(self, eje_y):
+    def _handle_right_click_event(self, eje_y, eje_x):
+        # Handle right mouse button click event
+        self._set_height(eje_y)
+        self._set_coords(eje_y, eje_x)
+        self._create_rectangle()
+        self._show_image(self.img_pos, self.img)
+        self._save_pxl()
+        self._last_height()
+
+
+    def _set_height(self, bottom):
         # Set rectangle points based on mouse position
         if self.img_pos == 0:
-            self.coords['height'] = (0,eje_y)
+            self.coords['height'] = (0,bottom)
         else:
-            self.coords['height'] = (0,eje_y+self.img_pos)
+            self.coords['height'] = (0,bottom+self.img_pos)
 
 
-    def _set_coords(self, eje_y):
+    def _set_coords(self, eje_y, width=600):
         # Set coordinates for the rectangle and save for later use
-        self.coords['witdh'] = (self.width,self.last_height)
-        self.coords['top_rtngl'] = self.last_height
-        self.coords['bottom_rtngl'] = eje_y+self.img_pos
+        self.coords['witdh'] = (width, self.last_height)
+        self.coords['rtngl_top'] = self.last_height
+        self.coords['rtngl_bottom'] = eje_y+self.img_pos
+        self.coords['rtngl_mid'] = width
+
 
 
     def _create_rectangle(self):
@@ -71,8 +85,9 @@ class MouseTracker:
     def _save_pxl(self):
         # Save the coordinates of the rectangle for save images
         self.save_pxl.append(
-            (self.coords['top_rtngl'],
-            self.coords['bottom_rtngl']))
+            (self.coords['rtngl_top'],
+            self.coords['rtngl_bottom'],
+            self.coords['rtngl_mid']))
 
 
     def _last_height(self):

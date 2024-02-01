@@ -5,53 +5,58 @@ import cv2
 import os
 
 class Editor:
+    # Initialize the Editor
     def __init__(self):
         self.path = ""
         self.name = ""
+        self.path_save = ""
         self.img = None
-        self.img_siz = (0, 0)
-        self.pxl_save = []
-        self.count = 0
 
 
     def cut_image(self):
+        # Main editor function ask and called functions
         self.path = filedialog.askopenfilename()
 
         if not self.path:
             return
 
-        self._select_name()
         self._handle_errors(self._rename_file)
         self._handle_errors(self._load_image)
-        self._rename_file()
-        self._load_image()
         self._show_image_info()
         self._show_image()
         self._set_mouse_callback()
 
 
-    def _select_name(self):
-        self.name = os.path.basename(os.path.dirname(self.path))
-
-
     def _rename_file(self):
-        directory, filename = os.path.split(self.path)
-        extension = os.path.splitext(filename)[1]
-        new_path = os.path.join(directory, f"{self.name}{extension}")
+        # Rename file for avoid issues
+        new_path = self._make_new_path()
         os.rename(self.path, new_path)
         self.path = new_path
 
+
+    def _make_new_path(self):
+        # Make and return the new path
+        directory, filename = os.path.split(self.path)
+        extnsn = os.path.splitext(filename)[1]
+
+        self.path_save = directory
+        self.name = os.path.basename(self.path_save)
+        return os.path.join(directory, f"{self.name}{extnsn}")
+
+
     def _load_image(self):
+        # Load the images for show later
         self.img = cv2.imread(self.path)
-        self.img_siz = self.img.shape
 
 
     def _show_image_info(self):
-        if self.img_siz[1] != 600:
+        if self.img.shape[1] != 600:
+            width = self.img.shape[1]
+            height = self.img.shape[0]
+
             MessageBox.showwarning(
                 "Tamaño",
-                f"La altura es de: {self.img_siz[0]} y el ancho es de {self.img_siz[1]}"
-            )
+                f"La altura es de: {height} y el ancho es de {width}")
 
 
     def _show_image(self, img=None):

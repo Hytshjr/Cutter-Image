@@ -1,10 +1,25 @@
-import os
+import numpy as np
 
-ruta = "D:/Fazil/2024/Enero/30-01/01 FEB - 07 FEB KV TOTTUS VERANO - HS - SUPERMERCADO/ALTA MAIL TT FOOD SUPERMERCADO 1-7 FEB.png"
+matrix = np.array([
+    [(1, 2, 3), (4, 5, 6), (7, 8, 9), (7, 8, 9), (7, 8, 9), (7, 8, 9)],
+    [(1, 2, 3), (4, 5, 6), (7, 8, 9), (7, 8, 9), (7, 8, 9), (7, 8, 9)],
+    [(1, 2, 3), (4, 5, 6), (7, 8, 9), (7, 8, 9), (7, 8, 9), (7, 8, 9)],
+    [(1, 2, 3), (4, 5, 6), (7, 8, 9), (7, 8, 9), (7, 8, 9), (7, 8, 9)],
+    [(1, 2, 3), (4, 5, 6), (7, 8, 9), (7, 8, 9), (7, 8, 9), (7, 8, 9)]
+])
+
+# Divide la matriz en dos segmentos específicos
+first_segment = matrix[:, :3]  # Primeras tres columnas
+second_segment = matrix[:, 3:]  # Resto de las columnas
+
+# Convierte las matrices de nuevo a listas de Python si es necesario
+first_segment = first_segment.tolist()
+second_segment = second_segment.tolist()
+
+print(first_segment)
+print(second_segment)
 
 
-# Obtener el directorio que contiene el archivo
+# img = self.img[self.coords['rtngl_top']:self.coords['rtngl_bottom'],self.coords['rtngl_mid']:]
 
-dir_fac = os.path.basename(os.path.dirname(ruta))
-
-print(dir_fac)
+# cv2.imshow('test', img)
