@@ -1,5 +1,5 @@
 from tkinter import messagebox as MessageBox
-from core.mouse import MouseTracker
+from core.mouse_tracker import MouseTracker
 from tkinter import filedialog
 import cv2
 import os

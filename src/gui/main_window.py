@@ -1,5 +1,5 @@
 from core.api_utils import replace_api, save_api
-from core.image import Editor
+from core.image_processing import Editor
 from decouple import config
 import tkinter as tk
 

@@ -10,7 +10,7 @@ matrix = np.array([
 
 # Divide la matriz en dos segmentos específicos
 first_segment = matrix[:, :3]  # Primeras tres columnas
-second_segment = matrix[:, 3:]  # Resto de las columnas
+second_segment = matrix[:, 3:5]  # Resto de las columnas
 
 # Convierte las matrices de nuevo a listas de Python si es necesario
 first_segment = first_segment.tolist()
