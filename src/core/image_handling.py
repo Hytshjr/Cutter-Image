@@ -12,6 +12,7 @@ class Editor:
         self.name = ""
         self.path_save = ""
         self.img = None
+        self.save_cuts = []
 
 
     def cut_image(self):
@@ -69,12 +70,12 @@ class Editor:
 
 
     def _set_mouse_callback(self):
-        tracker = MouseTracker(self)
-        cv2.setMouseCallback(self.name, tracker.main_track)
+        self.tracker = MouseTracker(self)
+        cv2.setMouseCallback(self.name, self.tracker.main_track)
 
 
     def _handle_key(self):
-        key = KeyHandler(self)
+        KeyHandler(self)
 
 
     def _handle_errors(self, func):

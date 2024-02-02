@@ -3,6 +3,8 @@ import cv2
 class KeyHandler:
     def __init__(self, editor_instance):
         self.editor = editor_instance
+        self.tracker = self.editor.tracker
+        self.img = self.editor.img
         self.bool_loop  = True
         self._init_loop()
 
@@ -14,31 +16,34 @@ class KeyHandler:
 
 
     def _handle_key(self, key):
-        if key == ord('l'):
-            self._clean_canva()
+        if key == ord('l') or key == ord('L'):
+            self._clean_img()
 
         elif key == 27:
             self._cancel_cutter()
 
-        elif key == ord('s'):
+        elif key == ord('s') or key == ord('S'):
             self._save_cuts()
 
 
-    def _clean_canva(self):
-        print('Presionaste la tecla "l"')
+    def _clean_img(self):
+        self.tracker.save_cuts = []
+        self.tracker.last_buttom = 0
+        self.tracker.img = self.img.copy()
+        self.editor._show_image(self.img)
 
 
     def _cancel_cutter(self):
-        print('Presionaste la tecla Esc (27)')
-        self._break_loop()
+        self._close_wnds()
 
 
     def _save_cuts(self):
-        print('Presionaste la tecla "s"')
-        self._break_loop()
+        self.editor.save_cuts = self.tracker.save_cuts
+        self._close_wnds()
 
 
-    def _break_loop(self):
+    def _close_wnds(self):
+        cv2.destroyAllWindows()
         self.bool_loop = False
 
 

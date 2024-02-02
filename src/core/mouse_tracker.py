@@ -9,7 +9,7 @@ class MouseTracker:
         self.img_pos = 0
         self.last_buttom = 0
         self.coords = {}
-        self.save_pxl = []
+        self.save_cuts = []
         self.coords_lelt = []
 
 
@@ -73,7 +73,7 @@ class MouseTracker:
 
         self.coords['line_bot_left'] = right_bot
         self.coords['line_top_rght'] = left_top
-        self._save_pxl()
+        self._save_cuts()
 
 
     def _create_rectangle(self):
@@ -93,7 +93,7 @@ class MouseTracker:
         self.editor._show_image(img[pos_top:pos_bottom:])
 
 
-    def _save_pxl(self):
+    def _save_cuts(self):
         # Save the coordinates of the rectangle for save images
-        self.save_pxl.append((self.line_top,
+        self.save_cuts.append((self.line_top,
                             self.line_bottom, self.line_right))
