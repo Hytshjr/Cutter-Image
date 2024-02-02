@@ -7,10 +7,11 @@ class MouseTracker:
         self.img = self.editor.img
         self.width = self.img.shape[1]
         self.img_pos = 0
-        self.last_top = 0
+        self.last_buttom = 0
         self.last_left = 0
         self.coords = {}
         self.save_pxl = []
+        self.coords_lelt = []
 
 
     def main_track(self, event, eje_x, eje_y, flags, param):
@@ -30,55 +31,54 @@ class MouseTracker:
         self._show_image(self.img_pos, self.img)
 
 
-    def _handle_left_click_event(self, eje_y):
+    def _handle_left_click_event(self, click_y):
         # Handle left mouse button click event
-        self._set_rctngl_size(eje_y, self.width, 0)
+        self._set_rctngl_size(click_y, self.width, 0)
         self._create_rectangle()
-        self._set_coords(eje_y, self.width)
-        self._save_pxl()
 
 
-    def _handle_right_click_event(self, eje_y, eje_x):
+    def _handle_right_click_event(self, click_y, click_x):
         # Handle right mouse button click event
-        self._set_rctngl_size(eje_y, eje_x, self.last_left)
+        self._set_rctngl_size(click_y, click_x, self.last_left)
         self._create_rectangle()
-        self._set_coords(eje_y, eje_x)
-        self._save_pxl()
 
 
-    def _set_rctngl_size(self, crd_bot, crd_right, crd_left):
+    def _set_rctngl_size(self, click_y, click_x, crd_left):
         # Set rectangle size based on mouse position
-        self._set_widht_rctngl(crd_right, crd_left)
-        self._set_hight_rctngl(crd_bot)
+        self._set_widht_rctngl(click_x, crd_left)
+        self._set_hight_rctngl(click_y)
         self._set_size_rctngl()
 
 
-    def _set_widht_rctngl(self, crd_right, crd_left):
-        self.line_ritght = crd_right
+    def _set_widht_rctngl(self, click_x, crd_left):
+        # Set rectangle widht based on mouse position
+        self.line_right = click_x
         self.line_left = crd_left
 
-        self.last_left = self.line_ritght
+        self.last_left = self.line_right
 
 
+    def _set_hight_rctngl(self, click_y):
+        # Set hight widht based on mouse position
+        rctngl_buttom = self.last_buttom
+        click_position = click_y + self.img_pos
 
-    def _set_hight_rctngl(self, crd_bot):
-        self.line_top = self.last_top
-        self.line_bottom = crd_bot+self.img_pos
+        if click_position > rctngl_buttom:
+            self.line_top = self.last_buttom
+            self.line_bottom = click_y + self.img_pos
 
-        if self.line_bottom < self.line_top:
-            self.line_bottom = self.last_top
-            self.line_top =  self.last_bot
-
-        self.last_top = self.line_bottom
-        self.last_bot = self.line_top
+            self.last_buttom = self.line_bottom
+            self.last_top = self.line_top
 
 
     def _set_size_rctngl(self):
+        # Set rectangle size on a dict
         left_bot = (self.line_left, self.line_bottom)
-        right_top = (self.line_ritght, self.line_top)
+        right_top = (self.line_right, self.line_top)
 
         self.coords['line_bot_left'] = left_bot
         self.coords['line_top_rght'] = right_top
+        self._save_pxl()
 
 
     def _create_rectangle(self):
@@ -98,21 +98,12 @@ class MouseTracker:
         self.editor._show_image(img[pos_top:pos_bottom:])
 
 
-    def _set_coords(self, eje_y, width):
-        # Sets the coordinates for the pixel to be saved.
-        self.coords['save_top'] = self.last_top
-        self.coords['save_bottom'] = eje_y+self.img_pos
-        self.coords['save_mid'] = width
-
-
     def _save_pxl(self):
         # Save the coordinates of the rectangle for save images
         self.save_pxl.append(
-            (self.coords['save_top'],
-            self.coords['save_bottom'],
-            self.coords['save_mid']))
-
-
+            (self.line_top,
+            self.line_bottom,
+            self.line_right))
 
 
 
