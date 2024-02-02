@@ -4,11 +4,10 @@ class MouseTracker:
     def __init__(self, editor_instance):
         # Initialize the MouseTracker with an Editor instance
         self.editor = editor_instance
-        self.img = self.editor.img
+        self.img = self.editor.img.copy()
         self.width = self.img.shape[1]
         self.img_pos = 0
         self.last_buttom = 0
-        self.last_left = 0
         self.coords = {}
         self.save_pxl = []
         self.coords_lelt = []
@@ -33,29 +32,27 @@ class MouseTracker:
 
     def _handle_left_click_event(self, click_y):
         # Handle left mouse button click event
-        self._set_rctngl_size(click_y, self.width, 0)
+        self._set_rctngl_size(click_y, self.width)
         self._create_rectangle()
 
 
     def _handle_right_click_event(self, click_y, click_x):
         # Handle right mouse button click event
-        self._set_rctngl_size(click_y, click_x, self.last_left)
+        self._set_rctngl_size(click_y, click_x)
         self._create_rectangle()
 
 
-    def _set_rctngl_size(self, click_y, click_x, crd_left):
+    def _set_rctngl_size(self, click_y, click_x):
         # Set rectangle size based on mouse position
-        self._set_widht_rctngl(click_x, crd_left)
+        self._set_widht_rctngl(click_x)
         self._set_hight_rctngl(click_y)
         self._set_size_rctngl()
 
 
-    def _set_widht_rctngl(self, click_x, crd_left):
+    def _set_widht_rctngl(self, click_x):
         # Set rectangle widht based on mouse position
+        self.line_left = 0
         self.line_right = click_x
-        self.line_left = crd_left
-
-        self.last_left = self.line_right
 
 
     def _set_hight_rctngl(self, click_y):
@@ -66,18 +63,16 @@ class MouseTracker:
         if click_position > rctngl_buttom:
             self.line_top = self.last_buttom
             self.line_bottom = click_y + self.img_pos
-
             self.last_buttom = self.line_bottom
-            self.last_top = self.line_top
 
 
     def _set_size_rctngl(self):
         # Set rectangle size on a dict
-        left_bot = (self.line_left, self.line_bottom)
-        right_top = (self.line_right, self.line_top)
+        right_bot = (self.line_right, self.line_bottom)
+        left_top = (self.line_left, self.line_top)
 
-        self.coords['line_bot_left'] = left_bot
-        self.coords['line_top_rght'] = right_top
+        self.coords['line_bot_left'] = right_bot
+        self.coords['line_top_rght'] = left_top
         self._save_pxl()
 
 
@@ -100,11 +95,5 @@ class MouseTracker:
 
     def _save_pxl(self):
         # Save the coordinates of the rectangle for save images
-        self.save_pxl.append(
-            (self.line_top,
-            self.line_bottom,
-            self.line_right))
-
-
-
-
+        self.save_pxl.append((self.line_top,
+                            self.line_bottom, self.line_right))

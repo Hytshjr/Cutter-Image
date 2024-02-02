@@ -1,5 +1,6 @@
 from tkinter import messagebox as MessageBox
 from core.mouse_tracker import MouseTracker
+from core.key_handilng import KeyPress
 from tkinter import filedialog
 import cv2
 import os
@@ -25,6 +26,7 @@ class Editor:
         self._show_image_info()
         self._show_image()
         self._set_mouse_callback()
+        self._handle_key()
 
 
     def _rename_file(self):
@@ -56,7 +58,7 @@ class Editor:
 
             MessageBox.showwarning(
                 "Tamaño",
-                f"La altura es de: {height} y el ancho es de {width}")
+                f"Height: {height}, Width: {width}")
 
 
     def _show_image(self, img=None):
@@ -69,6 +71,11 @@ class Editor:
     def _set_mouse_callback(self):
         tracker = MouseTracker(self)
         cv2.setMouseCallback(self.name, tracker.main_track)
+
+
+    def _handle_key(self):
+        key = KeyPress(self)
+        key.main_key()
 
 
     def _handle_errors(self, func):
