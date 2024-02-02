@@ -1,6 +1,6 @@
 from tkinter import messagebox as MessageBox
 from core.mouse_tracker import MouseTracker
-from core.key_handilng import KeyPress
+from core.key_handilng import KeyHandler
 from tkinter import filedialog
 import cv2
 import os
@@ -74,8 +74,7 @@ class Editor:
 
 
     def _handle_key(self):
-        key = KeyPress(self)
-        key.main_key()
+        key = KeyHandler(self)
 
 
     def _handle_errors(self, func):

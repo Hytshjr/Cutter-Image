@@ -1,22 +1,44 @@
 import cv2
 
-class KeyPress:
+class KeyHandler:
     def __init__(self, editor_instance):
         self.editor = editor_instance
+        self.bool_loop  = True
+        self._init_loop()
 
-    def main_key(self):
-         while cv2.waitKey(1) != -1:
-            k = cv2.waitKey(1)
 
-            if k != -1:
-                print(k)
+    def _init_loop(self):
+        while self.bool_loop:
+            key = cv2.waitKey(12000)
+            self._handle_key(key)
 
-                if k == ord('l'):
-                    print('l')
 
-                elif k == 27:
-                    print('esq')
+    def _handle_key(self, key):
+        if key == ord('l'):
+            self._clean_canva()
 
-                elif k == ord('s'):
-                    print('s')
+        elif key == 27:
+            self._cancel_cutter()
+
+        elif key == ord('s'):
+            self._save_cuts()
+
+
+    def _clean_canva(self):
+        print('Presionaste la tecla "l"')
+
+
+    def _cancel_cutter(self):
+        print('Presionaste la tecla Esc (27)')
+        self._break_loop()
+
+
+    def _save_cuts(self):
+        print('Presionaste la tecla "s"')
+        self._break_loop()
+
+
+    def _break_loop(self):
+        self.bool_loop = False
+
 
