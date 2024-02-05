@@ -8,10 +8,8 @@ class MouseTracker:
         self.width = self.img.shape[1]
         self.img_pos = 0
         self.last_bottom = 0
-        self.coords = {}
         self.save_cuts = []
-        self.coords_lelt = []
-        self.groups = {}
+        self.cuts = {}
 
 
     def main_track(self, event, eje_x, eje_y, flags, param):
@@ -33,68 +31,70 @@ class MouseTracker:
 
     def _handle_left_click_event(self, click_y):
         # Handle left mouse button click event
-        self._set_rctngl_size(click_y, self.width)
-        self._create_rectangle()
+        self._set_coords_area(click_y, self.width)
 
 
     def _handle_right_click_event(self, click_y, click_x):
         # Handle right mouse button click event
-        self._set_rctngl_size(click_y, click_x)
-        self._create_rectangle()
+        self._set_coords_area(click_y, click_x)
 
 
-    def _set_rctngl_size(self, click_y, click_x):
+    def _set_coords_area(self, click_y, click_x):
         # Set rectangle size based on mouse position
-        self._set_hight_rctngl(click_y)
-        self._set_widht_rctngl(click_x)
+        if self._is_click_out_area(click_y):
+            self._set_hight_area(click_y)
+        self._set_widht_area(click_x)
         self._set_size_rctngl()
 
 
-    def _set_hight_rctngl(self, click_y):
+    def _set_hight_area(self, click_y):
         # Set variables if the click is outside of rectangle
+        self.line_top = self.last_bottom
+        self.line_bottom = click_y + self.img_pos
+        self.last_bottom = self.line_bottom
+        self._set_new_cut_area()
+
+
+    def _set_widht_area(self, click_x):
+        # Set rectangle widht based on mouse position
+        self.line_left = 0
+        self.line_right = click_x
+        self.cuts[self.line_top].append(click_x)
+
+
+    def _is_click_out_area(self, click_y):
         rctngl_bottom = self.last_bottom
         click_position = click_y + self.img_pos
 
         if click_position > rctngl_bottom:
-            self._setup_height_variables(click_y)
-            self._set_new_cut_area()
+            return True
 
-
-    def _setup_height_variables(self, click_y):
-            self.line_top = self.last_bottom
-            self.line_bottom = click_y + self.img_pos
-            self.last_bottom = self.line_bottom
 
     def _set_new_cut_area(self):
-        if self.line_top  not in self.groups:
-                self.groups[self.line_top] = []
+        if self.line_top  not in self.cuts:
+            self.cuts[self.line_top] = []
 
         height_cut = (self.line_top, self.line_bottom)
-        self.groups[self.line_top].append(height_cut)
-
-
-    def _set_widht_rctngl(self, click_x):
-        # Set rectangle widht based on mouse position
-        self.line_left = 0
-        self.line_right = click_x
-        self.groups[self.line_top].append(click_x)
+        self.cuts[self.line_top].append(height_cut)
 
 
     def _set_size_rctngl(self):
         # Set rectangle size on a dict
         right_bot = (self.line_right, self.line_bottom)
         left_top = (self.line_left, self.line_top)
+        coords = {}
 
-        self.coords['line_right_bot'] = right_bot
-        self.coords['line_left_top'] = left_top
+        coords['line_right_bot'] = right_bot
+        coords['line_left_top'] = left_top
+        self._create_rectangle(coords)
 
 
-    def _create_rectangle(self):
+    def _create_rectangle(self, coords):
         # Create a green rectangle on the image
         color = (251, 0, 255)
         cv2.rectangle(
-            self.img, self.coords['line_right_bot'],
-            self.coords['line_left_top'], color)
+            self.img, coords['line_right_bot'],
+            coords['line_left_top'], color)
 
         self._show_image(self.img_pos, self.img)
 
