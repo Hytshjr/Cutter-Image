@@ -30,6 +30,7 @@ class Editor:
 
 
     def _set_paths(self):
+        # Set paths or dirs importans
         self.dir = Diretory()
         self.path = self.dir.path_img
         self.name = self.dir.name_img
@@ -39,19 +40,21 @@ class Editor:
         # Load the images for show later
         try:
             self.img = cv2.imread(self.path)
+            self.width = self.img.shape[1]
+            self.height = self.img.shape[0]
         except Exception as e:
             self._show_error(f"cv2.error: {e}")
 
 
     def _show_image_info(self):
+        # Show if the image is out the size allowed
         if self.img.shape[1] != 600:
-            width = self.img.shape[1]
-            height = self.img.shape[0]
-            message = f"Height: {height}, Width: {width}"
+            message = f"Height: {self.height}, Width: {self.width}"
             self._show_error(message)
 
 
     def _show_image(self, img=None):
+        # Show the image for user
         if img is None:
             cv2.imshow(self.name, self.img)
         else:
@@ -59,21 +62,26 @@ class Editor:
 
 
     def _set_mouse_callback(self):
+        # Call tack mouse for cut the image
         self.tracker = MouseTracker(self)
         cv2.setMouseCallback(self.name, self.tracker.main_track)
 
 
     def _handle_key(self):
+        # Call keyboard event for save or cancel the cuts
         KeyHandler(self)
 
 
     def _save_cuts(self):
+        # Init the process for saves the cuts
         self._process_coords(self.tracker.cuts)
         self._cut_image_coords(self.top, self.bot, self.right)
+        self.dir.set_dir_img()
         self._write_cuts()
 
 
     def _process_coords(self, coords):
+        # Process and order the coords for the cuts
         coords = list(coords.values())
         unpacked_coords = [
             (coord[0][0], coord[0][1], coord[1:])
@@ -83,14 +91,16 @@ class Editor:
 
 
     def _cut_image_coords(self, tops, bots, rights):
+        # Set the variables with the coords for cut the image
         for top, bot, right in zip(tops, bots, rights):
-            self._image_cutting(top, bot, right)
+            left = 0
+            self._image_cutting(top, bot, left,right)
 
 
-    def _image_cutting(self, top, bot, right):
-        left = 0
-        if right[0] != 600:
-            right.append(600)
+    def _image_cutting(self, top, bot, left,right):
+        # Cut the image and save the matriz in a list
+        if right[0] != self.width:
+            right.append(self.width)
 
         for right in right:
             image_cutter = self.img[top:bot, left:right]
@@ -99,17 +109,16 @@ class Editor:
 
 
     def _write_cuts(self):
-        self.dir.set_dir_img()
-        import os
-        self.dir_imgs = self.dir.dir_imgs
-        filename, extension = os.path.splitext(self.name)
-        for i ,cut in enumerate(self.save_imgs):
-            new_name = f"{filename}_{i}{extension}"
-            name = os.path.join(self.dir_imgs, new_name)
-            cv2.imwrite(name, cut)
+        # Save the cuts like imgfiles
+        num_cuts = len(self.save_imgs)
+        paths = self.dir.set_filesnames(num_cuts, self.name)
+
+        for path, cut in zip(paths, self.save_imgs):
+            cv2.imwrite(path, cut)
 
 
     def _handle_errors(self, func):
+        # Handle the error of functions
         try:
             func()
         except cv2.error as e:
@@ -117,4 +126,5 @@ class Editor:
 
 
     def _show_error(self, message):
+        # Show the error of functions
         MessageBox.showwarning("Error", f"Error: {message}")
