@@ -12,6 +12,8 @@ class Editor:
         self.name = ""
         self.img = ""
         self.save_cuts = []
+        self.save_imgs = []
+
 
 
     def cut_image(self):
@@ -66,54 +68,45 @@ class Editor:
 
 
     def _save_cuts(self):
+        self._process_coords(self.tracker.cuts)
+        self._cut_image_coords(self.top, self.bot, self.right)
+        self._write_cuts()
+
+
+    def _process_coords(self, coords):
+        coords = list(coords.values())
+        unpacked_coords = [
+            (coord[0][0], coord[0][1], coord[1:])
+            for coord in coords
+            ]
+        self.top, self.bot, self.right = zip(*unpacked_coords)
+
+
+    def _cut_image_coords(self, tops, bots, rights):
+        for top, bot, right in zip(tops, bots, rights):
+            self._image_cutting(top, bot, right)
+
+
+    def _image_cutting(self, top, bot, right):
+        left = 0
+        if right[0] != 600:
+            right.append(600)
+
+        for right in right:
+            image_cutter = self.img[top:bot, left:right]
+            self.save_imgs.append(image_cutter)
+            left = right
+
+
+    def _write_cuts(self):
         self.dir.set_dir_img()
-        self._process_cuts(self.save_cuts)
-
-
-    def _process_cuts(self, cuts):
-
         import os
-
-        list_cuts = list(cuts.values())
         self.dir_imgs = self.dir.dir_imgs
-
         filename, extension = os.path.splitext(self.name)
-
-
-        top = []
-        bottom = []
-        verticals = []
-        count = 0
-
-        for cut in list_cuts:
-            top.append(cut[0][0])
-            bottom.append(cut[0][1])
-            verticals.append(cut[1:])
-
-        for index, vertical in enumerate(verticals):
-
-            if vertical[0] == 600:
-                count += 1
-                new_name = f"{filename}_{count}{extension}"
-                name = os.path.join(self.dir_imgs, new_name)
-                image_cutter = self.img[top[index]:bottom[index], 0:vertical[0]]
-                cv2.imwrite(name, image_cutter)
-                print(name)
-
-            else:
-                left = 0
-                vertical.append(600)
-
-                for right in vertical:
-                    count += 1
-                    new_name = f"{filename}_{count}{extension}"
-                    name = os.path.join(self.dir_imgs, new_name)
-                    image_cutter = self.img[top[index]:bottom[index], left:right]
-                    cv2.imwrite(name, image_cutter)
-                    left = right
-                    print(name)
-
-
+        for i ,cut in enumerate(self.save_imgs):
+            new_name = f"{filename}_{i}{extension}"
+            name = os.path.join(self.dir_imgs, new_name)
+            cv2.imwrite(name, cut)
 
 
     def _handle_errors(self, func):
