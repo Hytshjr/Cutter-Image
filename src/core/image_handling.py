@@ -11,7 +11,6 @@ class Editor:
         self.path = ""
         self.name = ""
         self.img = ""
-        self.save_cuts = []
         self.save_imgs = []
 
 
@@ -26,7 +25,6 @@ class Editor:
         self._show_image()
         self._set_mouse_callback()
         self._handle_key()
-        self._save_cuts()
 
 
     def _set_paths(self):
@@ -72,9 +70,9 @@ class Editor:
         KeyHandler(self)
 
 
-    def _save_cuts(self):
+    def save_cuts(self, coords):
         # Init the process for saves the cuts
-        self._process_coords(self.tracker.cuts)
+        self._process_coords(coords)
         self._cut_image_coords(self.top, self.bot, self.right)
         self.dir.set_dir_img()
         self._write_cuts()
