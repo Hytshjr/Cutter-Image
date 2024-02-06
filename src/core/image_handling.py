@@ -7,6 +7,7 @@ import cv2
 class Editor:
     # Initialize the Editor
     def __init__(self):
+        self.dir_imgs = ""
         self.path = ""
         self.name = ""
         self.img = ""
@@ -63,26 +64,56 @@ class Editor:
     def _handle_key(self):
         KeyHandler(self)
 
+
     def _save_cuts(self):
         self.dir.set_dir_img()
         self._process_cuts(self.save_cuts)
 
 
     def _process_cuts(self, cuts):
-        list_test = []
-        for i in range(len(cuts)):
-            if i < len(cuts)-1:
-                if cuts[i][2] == 600:
-                    list_test = []
-                else:
-                    if cuts[i][0]==cuts[i+1][0]:
-                        list_test.append(cuts[i][2])
-                        list_test.append(cuts[i+1][2])
 
-                        print(cuts[i], cuts[i+1])
+        import os
+
+        list_cuts = list(cuts.values())
+        self.dir_imgs = self.dir.dir_imgs
+
+        filename, extension = os.path.splitext(self.name)
 
 
-        print('last:',list_test)
+        top = []
+        bottom = []
+        verticals = []
+        count = 0
+
+        for cut in list_cuts:
+            top.append(cut[0][0])
+            bottom.append(cut[0][1])
+            verticals.append(cut[1:])
+
+        for index, vertical in enumerate(verticals):
+
+            if vertical[0] == 600:
+                count += 1
+                new_name = f"{filename}_{count}{extension}"
+                name = os.path.join(self.dir_imgs, new_name)
+                image_cutter = self.img[top[index]:bottom[index], 0:vertical[0]]
+                cv2.imwrite(name, image_cutter)
+                print(name)
+
+            else:
+                left = 0
+                vertical.append(600)
+
+                for right in vertical:
+                    count += 1
+                    new_name = f"{filename}_{count}{extension}"
+                    name = os.path.join(self.dir_imgs, new_name)
+                    image_cutter = self.img[top[index]:bottom[index], left:right]
+                    cv2.imwrite(name, image_cutter)
+                    left = right
+                    print(name)
+
+
 
 
     def _handle_errors(self, func):
@@ -90,6 +121,7 @@ class Editor:
             func()
         except cv2.error as e:
             self._show_error(f"cv2.error: {e}")
+
 
     def _show_error(self, message):
         MessageBox.showwarning("Error", f"Error: {message}")

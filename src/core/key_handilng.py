@@ -38,7 +38,7 @@ class KeyHandler:
 
 
     def _save_cuts(self):
-        self.editor.save_cuts = self.tracker.save_cuts
+        self.editor.save_cuts = self.tracker.cuts
         self._close_wnds()
 
 
