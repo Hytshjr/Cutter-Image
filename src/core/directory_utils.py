@@ -62,7 +62,29 @@ class Diretory:
         self._create_dir(self.dir_imgs)
 
 
-
     def _create_dir(self, dir_create):
         if not os.path.exists(dir_create):
             os.makedirs(dir_create)
+
+
+    def set_filesnames(self, quantity, name):
+        filename, extension = os.path.splitext(name)
+        new_names = self._set_names(filename, extension, quantity)
+        paths = self._set_paths(new_names)
+        return paths
+
+
+    def _set_names(self, filename, extension, quantity):
+        name = [
+            f"{filename}_{num+1}{extension}"
+            for num in range(quantity)
+            ]
+        return name
+
+
+    def _set_paths(self, new_names):
+        paths = [
+            os.path.join(self.dir_imgs, new_name)
+            for new_name in new_names
+            ]
+        return paths
