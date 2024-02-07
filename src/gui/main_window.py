@@ -1,5 +1,6 @@
 from core.api_utils import replace_api, save_api
 from core.image_handling import Editor
+from core.button_utils import MainUtils
 from decouple import config
 import tkinter as tk
 
@@ -8,6 +9,8 @@ import tkinter as tk
 # Acces to environment variable from .env
 API_KEY = config('API_KEY')
 img_user = Editor()
+button_utls = MainUtils()
+
 
 class Frame(tk.Frame):
     def __init__(self, root=None):
@@ -49,7 +52,7 @@ class Frame(tk.Frame):
         self.boton_replpace.grid(row=1, column=1, pady=3)
 
         #Este boton recorte la imagen
-        self.boton_replpace = tk.Button(self, text='Recortar imagen', command=img_user.cut_image)
+        self.boton_replpace = tk.Button(self, text='Recortar imagen', command=button_utls.cut_image)
         self.boton_replpace.config(font = ('Helvetica',10,'bold'), width=40, border=0, fg='#23606E', bg='#FACFCE')
         self.boton_replpace.grid(row=2, column=0, pady=3, columnspan=2)
 
@@ -69,6 +72,6 @@ class Frame(tk.Frame):
         self.boton_replpace.grid(row=5, column=0, pady=3, columnspan=2)
 
         #Este boton hace el proceso de corte y compresion
-        self.boton_replpace = tk.Button(self, text='Corte y hacer HTML')
+        self.boton_replpace = tk.Button(self, text='Corte y hacer HTML', command=button_utls.cut_img_make_html)
         self.boton_replpace.config(font = ('Helvetica',10,'bold'), width=40, border=0, fg='#23606E', bg='#FACFCE')
         self.boton_replpace.grid(row=6, column=0, pady=3, columnspan=2)
