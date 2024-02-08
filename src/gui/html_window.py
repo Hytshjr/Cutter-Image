@@ -1,6 +1,6 @@
 import tkinter as tk
 
-class GenEntrys:
+class HtmlEntrys:
     def __init__(self) -> None:
         self.main = ""
         self.editor = ""

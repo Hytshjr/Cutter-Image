@@ -1,6 +1,6 @@
 from core.api_utils import replace_api, save_api
 from core.image_handling import Editor
-from core.button_utils import MainUtils
+from core.button_utils import ButtonUtils
 from decouple import config
 import tkinter as tk
 
@@ -9,7 +9,7 @@ import tkinter as tk
 # Acces to environment variable from .env
 API_KEY = config('API_KEY')
 img_user = Editor()
-button_utls = MainUtils()
+button_utls = ButtonUtils()
 
 
 class Frame(tk.Frame):
