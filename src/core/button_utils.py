@@ -1,5 +1,5 @@
 from core.image_handling import Editor
-from gui.html_window import HtmlEntrys
+from presentation.html_window import HtmlEntrys
 
 class ButtonUtils:
     def __init__(self):
