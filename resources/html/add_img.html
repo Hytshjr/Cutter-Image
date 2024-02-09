@@ -1,0 +1,19 @@
+{% extends 'table_base.html' %}
+{% block content %}{% for i in list_png %}
+    <tr>
+        <td>{% if i is iterable  %}
+            <table cellpadding="0" cellspacing="0">
+                <tr>{% for x in i %}
+                    <td>
+                        <a href="" target="_blank">
+                            <img border="0" class="banner" src="{{ x }}">
+                        </a>
+                    </td>{% endfor %}
+                </tr>
+            </table>{% else %}
+            <a href="" target="_blank">
+                <img border="0" class="banner" src="{{ i }}" style="display:block;" width="100%">
+            </a>{% endif %}
+        </td>
+    </tr>
+{% endfor %}{% endblock %}
