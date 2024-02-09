@@ -1,5 +1,5 @@
 from config import MEDIA_ROOT
-from presentation.main_window import Frame
+from interface.main_window import Frame
 import tkinter as tk
 import os
 
