@@ -1,9 +1,9 @@
-from core.api_utils import replace_api, save_api
+"""Module that create the main window."""
+import tkinter as tk
+from decouple import config
 from core.image_handling import Editor
 from core.button_utils import ButtonUtils
-from decouple import config
-import tkinter as tk
-
+from core.api_utils import replace_api, save_api
 
 
 # Acces to environment variable from .env
@@ -13,6 +13,8 @@ button_utls = ButtonUtils()
 
 
 class Frame(tk.Frame):
+    """Class add elements to main window"""
+
     def __init__(self, root=None):
         super().__init__(root)
         self.root = root
