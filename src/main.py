@@ -10,14 +10,13 @@ class App:
 
     def __init__(self, main_window):
         self.root = main_window
-        self._set_value_window()
+        self._set_title_app()
         self._set_icon_app()
-        self._call_gui()
+        self._add_elements()
 
 
-    def _set_value_window(self):
+    def _set_title_app(self):
         self.root.title("Image Cutter")
-        self.root.config(bg='#fff')
 
 
     def _set_icon_app(self):
@@ -26,7 +25,7 @@ class App:
         self.root.iconphoto(True, icon)
 
 
-    def _call_gui(self):
+    def _add_elements(self):
         Frame(self.root)
 
 
