@@ -1,9 +1,11 @@
 """Module that init all app."""
+# pylint: disable=import-error
 
 import os
 import tkinter as tk
 from config import MEDIA_ROOT
 from interface.views.main_window import Frame
+from controllers.controller_utils import Controller
 
 class App:
     """Class calling to main window"""
@@ -12,7 +14,6 @@ class App:
         self.root = main_window
         self._set_title_app()
         self._set_icon_app()
-        self._add_elements()
 
 
     def _set_title_app(self):
@@ -25,12 +26,9 @@ class App:
         self.root.iconphoto(True, icon)
 
 
-    def _add_elements(self):
-        Frame(self.root)
-
-
-
 if __name__ == "__main__":
-    root = tk.Tk()
-    app = App(root)
+    root        = tk.Tk()
+    app         = App(root)
+    controller  = Controller()
+    view        = Frame(root, controller)
     root.mainloop()

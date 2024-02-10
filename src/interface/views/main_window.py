@@ -1,8 +1,7 @@
 """Module that create the main window."""
+
 import tkinter as tk
 from decouple import config
-from core.api_utils import replace_api, save_api
-
 
 # Acces to environment variable from .env
 API_KEY = config('API_KEY')
@@ -10,11 +9,13 @@ API_KEY = config('API_KEY')
 class Frame(tk.Frame):
     """Class add elements to main window"""
 
-    def __init__(self, root):
+    def __init__(self, root, controller):
         super().__init__(root)
         self.root = root
         self.key_api = None
+        self.entry_api = None
         self.button_config = None
+        self.controller = controller
         self._set_style_frame()
         self._add_elements_frame()
         self._show_frame()
@@ -39,7 +40,7 @@ class Frame(tk.Frame):
     def _add_text_api(self):
         # Section text Api
         text_api = tk.Label(self, text = 'Introduce la Api: ')
-        text_api.config(font = ('Helvetica',10,'bold'), fg='#fff', bg='#23606E')
+        text_api.config(font = ('Helvetica',10,'bold'), fg='#fff', bg='#23666E')
         text_api.grid(row=0, column=0, padx=10, pady=15)
 
 
@@ -52,19 +53,19 @@ class Frame(tk.Frame):
 
     def _set_entry_api_on_frame(self):
         # Draw entry on Frame
-        entry_api = tk.Entry(self, textvariable=self.key_api)
-        entry_api.config(width=20, bg='#23606E', state='disable')
-        entry_api.grid(row=0, column=1)
+        self.entry_api = tk.Entry(self, textvariable=self.key_api)
+        self.entry_api.config(width=20, bg='#23606E', state='disable')
+        self.entry_api.grid(row=0, column=1)
 
 
     def _add_buttons_api(self):
         #Este primer button guarda el api
-        button_save = tk.Button(self, text='Guardar Api', **self.button_config,)
+        button_save = tk.Button(self, text='Guardar Api', **self.button_config, command=self.save_api)
         button_save.config(width=19)
         button_save.grid(row=1, column=0,  pady=3)
 
         #Este segundo button remplaza el api
-        button_replpace = tk.Button(self, text='Reemplazar Api', **self.button_config,)
+        button_replpace = tk.Button(self, text='Reemplazar Api', **self.button_config, command=self.update_api)
         button_replpace.config(width=19)
         button_replpace.grid(row=1, column=1, pady=3)
 
@@ -104,3 +105,15 @@ class Frame(tk.Frame):
 
     def _show_frame(self):
         self.pack()
+
+
+    def save_api(self):
+        """Save the api key on env file"""
+        key_api = self.key_api.get()
+        self.controller.save_key_api(key_api)
+        self.entry_api.config(state='disable')
+
+
+    def update_api(self):
+        """Set the entry on normal for update the api"""
+        self.entry_api.config(state='normal')
