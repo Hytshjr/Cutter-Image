@@ -1,19 +1,18 @@
-from config import MAIN_ROOT
-import fileinput
+"""File for hadle api key."""
+# pylint: disable=import-error
+
 import os
+import fileinput
+from config import CORE_ROOT
 
-def replace_api(entry_api):
-    entry_api.config(state='normal')
-
-def save_api(entry_api):
-    env_path = os.path.join(MAIN_ROOT, '.env')
+def save_key_api(key_api):
+    """Save the api key on env file."""
+    env_path = os.path.join(CORE_ROOT, '.env')
     option = 'API_KEY'
-
-    entry_api.config(state='disable')
 
     with fileinput.FileInput(env_path, inplace=True) as file:
         for line in file:
             if  option in line:
-                  print(f'{option}={entry_api.get()}')
+                print(f'{option}={key_api}')
             else:
-                  print(line, end='')
+                print(line, end='')
