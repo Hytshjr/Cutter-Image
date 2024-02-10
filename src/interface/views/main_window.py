@@ -1,79 +1,106 @@
 """Module that create the main window."""
 import tkinter as tk
 from decouple import config
-from core.image_handling import Editor
-from core.button_utils import ButtonUtils
 from core.api_utils import replace_api, save_api
 
 
 # Acces to environment variable from .env
 API_KEY = config('API_KEY')
-img_user = Editor()
-button_utls = ButtonUtils()
-
 
 class Frame(tk.Frame):
     """Class add elements to main window"""
 
-    def __init__(self, root=None):
+    def __init__(self, root):
         super().__init__(root)
         self.root = root
-        self.pack()
-        self.config(width=480, height=320, bg='#23606E')
-        self.campos_rellenar()
+        self.key_api = None
+        self.button_config = None
+        self._set_style_frame()
+        self._add_elements_frame()
+        self._show_frame()
 
 
-    def campos_rellenar(self):
-        self.create_api_section()
-        self.create_buttons()
+    def _set_style_frame(self):
+        self.config(bg='#23666E')
 
 
-    def create_api_section(self):
+    def _add_elements_frame(self):
+        self._create_api_section()
+        self._add_func_buttons()
+
+
+    def _create_api_section(self):
+        self._add_text_api()
+        self._add_entry_api()
+        self._set_style_buttons()
+        self._add_buttons_api()
+
+
+    def _add_text_api(self):
         # Section text Api
-        self.label_nombre = tk.Label(self, text = 'Introduce la Api: ')
-        self.label_nombre.config(font = ('Helvetica',10,'bold'),fg='#fff', bg='#23606E')
-        self.label_nombre.grid(row=0, column=0, padx=10, pady=15)
-
-        # Content of Api
-        self.compres_api = tk.StringVar() #Guarda lo que ingresa en el primer campo
-        self.compres_api.set(API_KEY)
-        self.entry_api = tk.Entry(self, textvariable = self.compres_api)
-        self.entry_api.config(width=20, bg='#23606E', state='disable')
-        self.entry_api.grid(row=0, column=1)
+        text_api = tk.Label(self, text = 'Introduce la Api: ')
+        text_api.config(font = ('Helvetica',10,'bold'), fg='#fff', bg='#23606E')
+        text_api.grid(row=0, column=0, padx=10, pady=15)
 
 
-    def create_buttons(self):
-        #Este primer boton guarda el api
-        self.boton_save = tk.Button(self, text='Guardar Api', command=lambda: save_api(self.entry_api))
-        self.boton_save.config(font = ('Helvetica',10,'bold'), width=20, border=0, fg='#23606E', bg='#FACFCE')
-        self.boton_save.grid(row=1, column=0,  pady=3)
+    def _add_entry_api(self):
+        # Content key Api
+        self.key_api = tk.StringVar()
+        self.key_api.set(API_KEY)
+        self._set_entry_api_on_frame()
 
-        #Este segundo boton remplaza el api
-        self.boton_replpace = tk.Button(self, text='Reemplazar Api', command=lambda: replace_api(self.entry_api))
-        self.boton_replpace.config(font = ('Helvetica',10,'bold'), width=20, border=0, fg='#23606E', bg='#FACFCE')
-        self.boton_replpace.grid(row=1, column=1, pady=3)
 
-        #Este boton recorte la imagen
-        self.boton_replpace = tk.Button(self, text='Recortar imagen', command=button_utls.cut_image)
-        self.boton_replpace.config(font = ('Helvetica',10,'bold'), width=40, border=0, fg='#23606E', bg='#FACFCE')
-        self.boton_replpace.grid(row=2, column=0, pady=3, columnspan=2)
+    def _set_entry_api_on_frame(self):
+        # Draw entry on Frame
+        entry_api = tk.Entry(self, textvariable=self.key_api)
+        entry_api.config(width=20, bg='#23606E', state='disable')
+        entry_api.grid(row=0, column=1)
 
-        #Este boton comprime las imagenes
-        self.boton_replpace = tk.Button(self, text='Comprimir imagenes' )
-        self.boton_replpace.config(font = ('Helvetica',10,'bold'), width=40, border=0, fg='#23606E', bg='#FACFCE')
-        self.boton_replpace.grid(row=3, column=0, pady=3, columnspan=2)
 
-        #Este boton crea el nuevo frame para hacer el html
-        self.boton_replpace = tk.Button(self, text='Hacer el html', )#command=self.create_html)
-        self.boton_replpace.config(font = ('Helvetica',10,'bold'), width=40, border=0, fg='#23606E', bg='#FACFCE')
-        self.boton_replpace.grid(row=4, column=0, pady=3, columnspan=2)
+    def _add_buttons_api(self):
+        #Este primer button guarda el api
+        button_save = tk.Button(self, text='Guardar Api', **self.button_config,)
+        button_save.config(width=19)
+        button_save.grid(row=1, column=0,  pady=3)
 
-        #Este boton hace el proceso de corte y compresion
-        self.boton_replpace = tk.Button(self, text='Corte y compresion de imagen')
-        self.boton_replpace.config(font = ('Helvetica',10,'bold'), width=40, border=0, fg='#23606E', bg='#FACFCE')
-        self.boton_replpace.grid(row=5, column=0, pady=3, columnspan=2)
+        #Este segundo button remplaza el api
+        button_replpace = tk.Button(self, text='Reemplazar Api', **self.button_config,)
+        button_replpace.config(width=19)
+        button_replpace.grid(row=1, column=1, pady=3)
 
-        #Este boton hace el proceso de corte y compresion
-        self.boton_replpace = tk.Button(self, text='Corte y hacer HTML', command=button_utls.cut_img_make_html)
-        self.boton_replpace.config(font = ('Helvetica',10,'bold'), width=40, border=0, fg='#23606E', bg='#FACFCE')
-        self.boton_replpace.grid(row=6, column=0, pady=3, columnspan=2)
+
+    def _add_func_buttons(self):
+        # Este botón recorta la imagen
+        button_cut = tk.Button(self, text='Recortar imagen', **self.button_config)
+        button_cut.grid(row=2, column=0, pady=3, columnspan=2)
+
+        # Este botón comprime las imágenes
+        button_compress = tk.Button(self, text='Comprimir imágenes', **self.button_config)
+        button_compress.grid(row=3, column=0, pady=3, columnspan=2)
+
+        # Este botón crea el nuevo frame para hacer el HTML
+        button_html = tk.Button(self, text='Hacer el HTML', **self.button_config)
+        button_html.grid(row=4, column=0, pady=3, columnspan=2)
+
+        # Este botón hace el proceso de corte y compresión
+        button_cut_compress = tk.Button(self, text='Corte y compresión de imagen', **self.button_config)
+        button_cut_compress.grid(row=5, column=0, pady=3, columnspan=2)
+
+        # Este botón hace el proceso de corte y compresión y crea el HTML
+        button_cut_html = tk.Button(self, text='Corte y hacer HTML', **self.button_config)
+        button_cut_html.grid(row=6, column=0, pady=3, columnspan=2)
+
+
+    def _set_style_buttons(self):
+        # Configuration common for buttons
+        self.button_config = {
+            'font': ('Helvetica', 10, 'bold'),
+            'width': 40,
+            'border': 0,
+            'fg': '#23606E',
+            'bg': '#FACFCE'
+        }
+
+
+    def _show_frame(self):
+        self.pack()
