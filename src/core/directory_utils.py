@@ -5,11 +5,11 @@ from .exceptions import show_error
 class HandlePaths:
     """Handle the paths of files and directories"""
 
-    def __init__(self):
+    def __init__(self, image_file_path):
+        self.image_file_path = image_file_path
         self.images_files_paths_for_cuts = []
         self.dir_compress_path = None
         self.dir_parent_path = None
-        self.image_file_path = None
         self.dir_cuts_path = None
 
 
@@ -36,16 +36,15 @@ class HandlePaths:
         return os.path.join(self.dir_parent_path, directory)
 
 
-    def process_img_path(self, file_path):
+    def process_img_path(self):
         """Call method for process the path and utils"""
 
-        self._set_image_file_path(file_path)
         self._set_dir_parent_path()
         self._set_dir_cuts_path()
         self._set_dir_compress_path()
 
 
-    def get_file_path(self):
+    def get_image_file_path(self):
         return self.image_file_path
 
 
@@ -77,7 +76,7 @@ class HandlePaths:
 
 
 
-class HandleNameFile:
+class HandleNameFiles:
     """Handle name of file"""
     def __init__(self, path_instance):
         self.path_instance = path_instance
@@ -86,6 +85,11 @@ class HandleNameFile:
         self.project_name = None
         self.image_name = None
         self.html_name = None
+
+
+    def process_img_name(self):
+        """Call method for process the name of file and utils"""
+
         self._set_image_extension()
         self._set_project_name()
         self._set_image_name()
@@ -93,7 +97,7 @@ class HandleNameFile:
 
 
     def _set_image_extension(self):
-        file_path = self.path_instance.get_file_path()
+        file_path = self.path_instance.get_image_file_path()
         self.image_extension = os.path.splitext(file_path)[1]
 
 
@@ -103,11 +107,8 @@ class HandleNameFile:
 
 
     def _set_image_name(self):
-        if self.project_name is None:
-            self.html_name = f'Name not found{self.image_extension}'
-            return
-
-        self.image_name = self.project_name +  self.image_extension
+        img_path = self.path_instance.get_image_file_path()
+        self.image_name = os.path.basename(img_path)
 
 
     def _set_html_name(self):
@@ -132,6 +133,18 @@ class HandleNameFile:
 
     def get_image_extension(self):
         return  self.image_extension
+
+
+    def refresh_data_name(self):
+        self.process_img_name()
+
+
+    def set_new_name_for_rename_img(self):
+        new_name = self.project_name + self.image_extension
+        self.image_name = new_name
+
+        return new_name
+
 
 
     def get_names_for_cuts(self, cuts_quantity):
