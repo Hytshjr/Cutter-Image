@@ -1,32 +1,34 @@
-from tkinter.filedialog import askopenfilename
-# from tkinter import messagebox as MessageBox
 import os
+from .exceptions import show_error
 
 
 class HandlePaths:
     """Handle the paths of files and directories"""
-    def __init__(self, file_path):
-        self.file_path = file_path
-        self.dir_parent_path = str
-        self.dir_cuts_path = str
-        self.dir_compress_path = str
-        self._set_dir_parent_path()
-        self._set_dir_cuts_path()
-        self._set_dir_compress_path()
+
+    def __init__(self):
+        self.images_files_paths_for_cuts = []
+        self.dir_compress_path = None
+        self.dir_parent_path = None
+        self.image_file_path = None
+        self.dir_cuts_path = None
+
+
+    def _set_image_file_path(self, file_path):
+        self.image_file_path = file_path
 
 
     def _set_dir_parent_path(self):
-        dir_parent_path = os.path.dirname(self.file_path)
+        dir_parent_path = os.path.dirname(self.image_file_path)
         self.dir_parent_path = dir_parent_path
 
 
     def _set_dir_cuts_path(self):
-        dir_cuts_path = self._create_dir_path( 'images')
+        dir_cuts_path = self._create_dir_path('images')
         self.dir_cuts_path = dir_cuts_path
 
 
     def _set_dir_compress_path(self):
-        dir_compress_path = self._create_dir_path( 'compress')
+        dir_compress_path = self._create_dir_path('compress')
         self.dir_compress_path = dir_compress_path
 
 
@@ -34,8 +36,17 @@ class HandlePaths:
         return os.path.join(self.dir_parent_path, directory)
 
 
+    def process_img_path(self, file_path):
+        """Call method for process the path and utils"""
+
+        self._set_image_file_path(file_path)
+        self._set_dir_parent_path()
+        self._set_dir_cuts_path()
+        self._set_dir_compress_path()
+
+
     def get_file_path(self):
-        return self.file_path
+        return self.image_file_path
 
 
     def get_dir_parent_path(self):
@@ -50,8 +61,19 @@ class HandlePaths:
         return self.dir_compress_path
 
 
-    def update_file_path(self, new_path):
-        self.file_path = new_path
+    def update_image_file_path(self, new_image_path):
+        self.image_file_path = new_image_path
+
+
+    def get_images_files_paths_for_cuts(self, files_names):
+        """Create the paths for the cuts of img"""
+
+        self.images_files_paths_for_cuts = [
+            os.path.join(self.dir_cuts_path, file_name)
+            for file_name in files_names
+            ]
+
+        return self.images_files_paths_for_cuts
 
 
 
@@ -60,6 +82,7 @@ class HandleNameFile:
     def __init__(self, path_instance):
         self.path_instance = path_instance
         self.image_extension = None
+        self.names_for_cuts = None
         self.project_name = None
         self.image_name = None
         self.html_name = None
@@ -111,24 +134,30 @@ class HandleNameFile:
         return  self.image_extension
 
 
+    def get_names_for_cuts(self, cuts_quantity):
+        """Return the names for cuts of img"""
+
+        return self._create_names_for_cuts(cuts_quantity)
+
+
+    def _create_names_for_cuts(self, cuts_quantity):
+        img_name = self.project_name
+        img_extension = self.image_extension
+        names_files_img_cut = []
+
+        for cut_number in range(cuts_quantity):
+            cut_number_file = cut_number + 1
+            name_img_cut = f"{img_name}_{cut_number_file}"
+            name_file_img_cut = name_img_cut + img_extension
+            names_files_img_cut.append(name_file_img_cut)
+
+        return names_files_img_cut
+
+
 
 def rename_file(old_path, new_path):
+    """Rename the files"""
     try:
         os.rename(old_path, new_path)
     except ImportError as e:
-        print(e)
-
-def run ():
-    """func MAIN"""
-
-    file_path = askopenfilename()
-    hanlde_path = HandlePaths(file_path)
-    handle_name = HandleNameFile(hanlde_path)
-    old_path = hanlde_path.get_file_path()
-    new_filename = handle_name.get_image_name()
-    dir_parent_path = hanlde_path.get_dir_parent_path()
-    new_path = os.path.join(dir_parent_path, new_filename)
-
-    rename_file(old_path, new_path)
-
-    hanlde_path.update_file_path(new_path)
+        show_error(e)
