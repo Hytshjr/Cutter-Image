@@ -2,169 +2,162 @@ import os
 from .exceptions import show_error
 
 
-class HandlePaths:
-    """Handle the paths of files and directories"""
+class ComponentsProject:
+    """Class that handle the components the project"""
+    def __init__(self, project_main_file):
+        self.__project_main_file = project_main_file
+        self.__project_dir_parent_path = None
+        self.__project_format = None
+        self.__project_name = None
+        self.__set_project_dir_parent_path()
+        self.__set_project_format()
+        self.__set_project_name()
 
-    def __init__(self, image_file_path):
-        self.image_file_path = image_file_path
-        self.images_files_paths_for_cuts = []
-        self.dir_compress_path = None
-        self.dir_parent_path = None
-        self.dir_cuts_path = None
 
+    @property
+    def project_main_file(self):
+        """give the value of private intance"""
 
-    def _set_image_file_path(self, file_path):
-        self.image_file_path = file_path
+        return self.__project_main_file
 
+    @property
+    def project_format(self):
+        """give the value of private intance"""
 
-    def _set_dir_parent_path(self):
-        dir_parent_path = os.path.dirname(self.image_file_path)
-        self.dir_parent_path = dir_parent_path
+        return self.__project_format
 
 
-    def _set_dir_cuts_path(self):
-        dir_cuts_path = self._create_dir_path('images')
-        self.dir_cuts_path = dir_cuts_path
+    @property
+    def project_name(self):
+        """give the value of private intance"""
 
+        return self.__project_name
 
-    def _set_dir_compress_path(self):
-        dir_compress_path = self._create_dir_path('compress')
-        self.dir_compress_path = dir_compress_path
 
+    @property
+    def project_dir_parent_path(self):
+        """give the value of private intance"""
 
-    def _create_dir_path(self, directory):
-        return os.path.join(self.dir_parent_path, directory)
+        return self.__project_dir_parent_path
 
 
-    def process_img_path(self):
-        """Call method for process the path and utils"""
+    def verify_path_exist(self, path):
+        """Verify if the path exist"""
 
-        self._set_dir_parent_path()
-        self._set_dir_cuts_path()
-        self._set_dir_compress_path()
+        if os.path.exists(path):
+            return True
 
+        return False
 
-    def get_image_file_path(self):
-        return self.image_file_path
 
+    def update_project_main_file(self, new_project_main_file):
+        """update the main faile for a change path"""
 
-    def get_dir_parent_path(self):
-        return self.dir_parent_path
+        self.__project_main_file = new_project_main_file
 
 
-    def get_dir_cuts_path(self):
-        return self.dir_cuts_path
+    def __set_project_dir_parent_path(self):
+        dir_path = os.path.dirname(self.__project_main_file)
 
+        if self.verify_path_exist(dir_path):
+            self.__project_dir_parent_path = dir_path
 
-    def get_dir_compress_path(self):
-        return self.dir_compress_path
 
+    def __set_project_format(self):
+        extension = os.path.splitext(self.__project_main_file)[1]
+        self.__project_format = extension
 
-    def update_image_file_path(self, new_image_path):
-        self.image_file_path = new_image_path
 
+    def __set_project_name(self):
+        parent_path = self.__project_dir_parent_path
+        self.__project_name = os.path.basename(parent_path)
 
-    def get_images_files_paths_for_cuts(self, files_names):
-        """Create the paths for the cuts of img"""
 
-        self.images_files_paths_for_cuts = [
-            os.path.join(self.dir_cuts_path, file_name)
-            for file_name in files_names
-            ]
 
-        return self.images_files_paths_for_cuts
+class ImageFile(ComponentsProject):
+    """Representing a image file and components"""
 
+    def __init__(self, project_main_file):
+        super().__init__(project_main_file)
+        self.__image_file_name = None
+        self.__image_file_path = None
+        self.__set_image_file_name()
+        self.__set_image_file_path()
 
 
-class HandleNameFiles:
-    """Handle name of file"""
-    def __init__(self, path_instance):
-        self.path_instance = path_instance
-        self.image_extension = None
-        self.names_for_cuts = None
-        self.project_name = None
-        self.image_name = None
-        self.html_name = None
+    @property
+    def image_file_path(self):
+        """give the value of private intance"""
 
+        return self.__image_file_path
 
-    def process_img_name(self):
-        """Call method for process the name of file and utils"""
 
-        self._set_image_extension()
-        self._set_project_name()
-        self._set_image_name()
-        self._set_html_name()
+    @property
+    def image_file_name(self):
+        """give the value of private intance"""
 
+        return self.__image_file_name
 
-    def _set_image_extension(self):
-        file_path = self.path_instance.get_image_file_path()
-        self.image_extension = os.path.splitext(file_path)[1]
 
+    def __set_image_file_name(self):
+        image_name = self.project_name + self.project_format
+        if image_name:
+            self.__image_file_name = image_name
 
-    def _set_project_name(self):
-        parent_path = self.path_instance.get_dir_parent_path()
-        self.project_name = os.path.basename(parent_path)
 
+    def __set_image_file_path(self):
+        image_file_path = self.__create_image_path()
+        self.__image_file_path = image_file_path
 
-    def _set_image_name(self):
-        img_path = self.path_instance.get_image_file_path()
-        self.image_name = os.path.basename(img_path)
 
+    def __create_image_path(self):
+        parent_dir_path = self.project_dir_parent_path
+        image_file_name = self.image_file_name
 
-    def _set_html_name(self):
-        if self.project_name is None:
-            self.html_name  = 'Name File not found.html'
-            return
+        return os.path.join(parent_dir_path, image_file_name)
 
-        self.html_name = self.project_name + '.html'
 
 
-    def get_project_name(self):
-        return self.project_name
+class HtmlFile(ComponentsProject):
+    """Representing a image file and components"""
 
+    def __init__(self, project_main_file):
+        super().__init__(project_main_file)
+        self.__html_file_name = None
+        self.__html_file_path = None
+        self.__set_html_file_name()
+        self.__set_html_file_path()
 
-    def get_image_name(self):
-        return self.image_name
 
+    @property
+    def html_file_path(self):
+        """give the value of private intance"""
 
-    def get_html_name(self):
-        return self.html_name
+        return self.__html_file_path
 
 
-    def get_image_extension(self):
-        return  self.image_extension
+    @property
+    def html_file_name(self):
+        """give the value of private intance"""
 
+        return self.__html_file_name
 
-    def refresh_data_name(self):
-        self.process_img_name()
 
+    def __set_html_file_name(self):
+        html_name = self.project_name + '.html'
+        self.__html_file_name = html_name
 
-    def set_new_name_for_rename_img(self):
-        new_name = self.project_name + self.image_extension
-        self.image_name = new_name
 
-        return new_name
+    def __set_html_file_path(self):
+        html_file_path = self.__create_image_path()
+        self.__html_file_path = html_file_path
 
 
+    def __create_image_path(self):
+        parent_dir_path = self.project_dir_parent_path
+        html_file_name = self.html_file_name
 
-    def get_names_for_cuts(self, cuts_quantity):
-        """Return the names for cuts of img"""
-
-        return self._create_names_for_cuts(cuts_quantity)
-
-
-    def _create_names_for_cuts(self, cuts_quantity):
-        img_name = self.project_name
-        img_extension = self.image_extension
-        names_files_img_cut = []
-
-        for cut_number in range(cuts_quantity):
-            cut_number_file = cut_number + 1
-            name_img_cut = f"{img_name}_{cut_number_file}"
-            name_file_img_cut = name_img_cut + img_extension
-            names_files_img_cut.append(name_file_img_cut)
-
-        return names_files_img_cut
+        return os.path.join(parent_dir_path, html_file_name)
 
 
 
