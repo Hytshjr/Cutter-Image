@@ -1,57 +1,61 @@
+"""Module for manage the key event of the keyboard"""
+# pylint: disable=no-member
+
 import cv2
 
-class KeyHandler:
-    def __init__(self, editor_instance):
-        # Init the loop for recieve the envents
-        self.editor = editor_instance
-        self.tracker = self.editor.tracker
-        self.img = self.editor.img
-        self.bool_loop  = True
+class KeyTracking:
+    """Handle the events of keyboard"""
+
+    def __init__(self, mouse_tracking):
+        self.__mouse_tracking = mouse_tracking
+        self.__if_loop_continues  = True
         self._init_loop()
 
 
     def _init_loop(self):
-        # Set the loop
-        while self.bool_loop:
+        while self.if_loop_continues:
             key = cv2.waitKey(12000)
-            self._handle_key(key)
+            self.__handle_key(key)
 
 
-    def _handle_key(self, key):
-        # Verify what event is
+    def __handle_key(self, key):
         if key == ord('l') or key == ord('L'):
-            self._clean_img()
+            self.__clean_image()
 
         elif key == 27:
-            self._cancel_cutter()
+            self.__cancel_clipping()
 
         elif key == ord('s') or key == ord('S'):
-            self._save_cuts()
+            self.__save_image_clippings()
 
 
-    def _clean_img(self):
-        # Clean the image for new cuts
-        self.tracker.last_bottom = 0
-        self.tracker.img_pos = 0
-        self.tracker.img = self.img.copy()
-        self.editor._show_image(self.img)
+    def __clean_image(self):
+        self.mouse_tracking.reset_image_crop()
 
 
-    def _cancel_cutter(self):
-        # Cancel and close the windows for the cuts
-        self._close_wnds()
+
+    def __cancel_clipping(self):
+        self.__close_window()
 
 
-    def _save_cuts(self):
-        # Init the save the cuts
-        self._close_wnds()
-        self.editor.save_imgs = []
-        self.editor.save_cuts(self.tracker.cuts)
+    def __save_image_clippings(self):
+        self.__close_window()
 
 
-    def _close_wnds(self):
-        # Close the windows that show the image
+    def __close_window(self):
         cv2.destroyAllWindows()
-        self.bool_loop = False
+        self.__if_loop_continues = False
 
 
+    @property
+    def mouse_tracking(self):
+        """give the value of private intance"""
+
+        return self.__mouse_tracking
+
+
+    @property
+    def if_loop_continues(self):
+        """give the value of private intance"""
+
+        return self.__if_loop_continues

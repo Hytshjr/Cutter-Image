@@ -89,7 +89,7 @@ class CutterWindowController(Image):
         image_matrix = self.image_matrix
         project_name = self.project_name
         mouse_tracking = MouseTracking(image_matrix, project_name)
-        KeyTracking(image_matrix, mouse_tracking)
+        KeyTracking(mouse_tracking)
 
 
     def __show_cutter_window(self, image_matrix):
