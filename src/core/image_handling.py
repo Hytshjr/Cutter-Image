@@ -77,7 +77,6 @@ class CutterWindowController(Image):
     def __init__(self, image_file_path, project_name):
         super().__init__(image_file_path)
         self.__project_name = project_name
-        self.__if_loop_continues  = True
         self.__init_cutter_window()
 
 
@@ -104,10 +103,3 @@ class CutterWindowController(Image):
         """give the value of private intance"""
 
         return self.__project_name
-
-
-    @property
-    def if_loop_continues(self):
-        """give the value of private intance"""
-
-        return self.__if_loop_continues
