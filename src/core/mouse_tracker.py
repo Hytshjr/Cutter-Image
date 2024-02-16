@@ -11,10 +11,10 @@ class MouseTracking:
 
     def __init__(self, image_matrix, project_name):
         self.__image_matrix_clean = image_matrix
+        self.__rectangle_area_coordinates = {}
         self.__image_matrix_utility = None
         self.__project_name = project_name
         self.__image_matrix_width = None
-        self.__cut_area_coordinates = {}
         self.__position_window = 0
         self.__last_bottom = 0
         self.__set_image_matrix_for_utility()
@@ -57,13 +57,13 @@ class MouseTracking:
 
 
     def __handle_right_click_event(self, click_y, click_x):
-        self.__set_cut_area(click_y, click_x)
+        self.__set_rectangle_area(click_y, click_x)
         self.__set_rectangle_area_to_draw()
         self.__draw_reactangle_in_window()
 
 
     def __handle_left_click_event(self, click_y):
-        self.__set_cut_area(click_y, self.image_matrix_width)
+        self.__set_rectangle_area(click_y, self.image_matrix_width)
         self.__set_rectangle_area_to_draw()
         self.__draw_reactangle_in_window()
 
@@ -72,37 +72,37 @@ class MouseTracking:
         self.__position_window += updated_position
 
 
-    def __set_cut_area(self, click_y, click_x):
+    def __set_rectangle_area(self, click_y, click_x):
         if self.__click_is_outside_cut_area(click_y):
-            self.__set_cut_area_height(click_y)
-        self.__set_cut_area_widht(click_x)
+            self.__set_rectangle_area_height(click_y)
+        self.__set_rectangle_area_widht(click_x)
 
 
-    def __set_cut_area_height(self, click_y):
-        self.cut_area_coordinates.update({
+    def __set_rectangle_area_height(self, click_y):
+        self.rectangle_area_coordinates.update({
                     'top': self.last_bottom,
                     'bottom': click_y + self.position_window
                 })
-        self.__last_bottom = self.cut_area_coordinates['bottom']
+        self.__last_bottom = self.rectangle_area_coordinates['bottom']
 
 
-    def __set_cut_area_widht(self, click_x):
-        self.cut_area_coordinates.update({
+    def __set_rectangle_area_widht(self, click_x):
+        self.rectangle_area_coordinates.update({
             'left': 0,
             'right': click_x
         })
 
 
     def __set_rectangle_area_to_draw(self):
-        top = self.cut_area_coordinates['top']
-        bottom = self.cut_area_coordinates['bottom']
-        left = self.cut_area_coordinates['left']
-        right = self.cut_area_coordinates['right']
+        top = self.rectangle_area_coordinates['top']
+        bottom = self.rectangle_area_coordinates['bottom']
+        left = self.rectangle_area_coordinates['left']
+        right = self.rectangle_area_coordinates['right']
 
         right_bot = (right, bottom)
         left_top = (left, top)
 
-        self.cut_area_coordinates.update({
+        self.rectangle_area_coordinates.update({
             'right_bottom': right_bot,
             'left_top': left_top
         })
@@ -110,9 +110,12 @@ class MouseTracking:
 
     def __draw_reactangle_in_window(self):
         color = (251, 0, 255)
+        right_bot = self.rectangle_area_coordinates['right_bottom']
+        left_top = self.rectangle_area_coordinates['left_top']
+
         cv2.rectangle(
-            self.image_matrix_utility, self.cut_area_coordinates['right_bottom'],
-            self.cut_area_coordinates['left_top'], color)
+            self.image_matrix_utility, right_bot,
+            left_top, color)
 
 
     def __click_is_outside_cut_area(self, click_y):
@@ -130,9 +133,11 @@ class MouseTracking:
 
 
     def __scroll_image(self):
-        position_top = self.position_window
-        position_bottom = self.position_window + 1080
-        return self.image_matrix_utility[position_top:position_bottom]
+        size_window = 1080
+        top_image = self.position_window
+        bottom_image = self.position_window + size_window
+
+        return self.image_matrix_utility[top_image:bottom_image]
 
 
     def reset_image_crop(self):
@@ -140,7 +145,7 @@ class MouseTracking:
 
         self.__last_bottom = 0
         self.__position_window = 0
-        self.__cut_area_coordinates.clear()
+        self.__rectangle_area_coordinates.clear()
         self.__set_image_matrix_for_utility()
         self.__refresh_window_image()
 
@@ -150,6 +155,13 @@ class MouseTracking:
         """give the value of private intance"""
 
         return self.__image_matrix_clean
+
+
+    @property
+    def rectangle_area_coordinates(self):
+        """give the value of private intance"""
+
+        return self.__rectangle_area_coordinates
 
 
     @property
@@ -185,10 +197,3 @@ class MouseTracking:
         """give the value of private intance"""
 
         return self.__last_bottom
-
-
-    @property
-    def cut_area_coordinates(self):
-        """give the value of private intance"""
-
-        return self.__cut_area_coordinates
