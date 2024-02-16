@@ -5,7 +5,6 @@
 import cv2
 
 
-
 class MouseTracking:
     """Class for tracking mouse events"""
 
@@ -58,13 +57,11 @@ class MouseTracking:
 
     def __handle_right_click_event(self, click_y, click_x):
         self.__set_rectangle_area(click_y, click_x)
-        self.__set_rectangle_area_to_draw()
         self.__draw_reactangle_in_window()
 
 
     def __handle_left_click_event(self, click_y):
         self.__set_rectangle_area(click_y, self.image_matrix_width)
-        self.__set_rectangle_area_to_draw()
         self.__draw_reactangle_in_window()
 
 
@@ -102,16 +99,12 @@ class MouseTracking:
         right_bot = (right, bottom)
         left_top = (left, top)
 
-        self.rectangle_area_coordinates.update({
-            'right_bottom': right_bot,
-            'left_top': left_top
-        })
+        return right_bot, left_top
 
 
     def __draw_reactangle_in_window(self):
+        right_bot, left_top = self.__set_rectangle_area_to_draw()
         color = (251, 0, 255)
-        right_bot = self.rectangle_area_coordinates['right_bottom']
-        left_top = self.rectangle_area_coordinates['left_top']
 
         cv2.rectangle(
             self.image_matrix_utility, right_bot,
