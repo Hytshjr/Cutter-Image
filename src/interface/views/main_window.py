@@ -1,5 +1,6 @@
 """Module that create the main window."""
 
+from tkinter.filedialog import askopenfilename
 import tkinter as tk
 from decouple import config
 
@@ -72,7 +73,7 @@ class Frame(tk.Frame):
 
     def _add_func_buttons(self):
         # Este botón recorta la imagen
-        button_cut = tk.Button(self, text='Recortar imagen', **self.button_config)
+        button_cut = tk.Button(self, text='Recortar imagen', **self.button_config, command=self.open_windows_cutter_image)
         button_cut.grid(row=2, column=0, pady=3, columnspan=2)
 
         # Este botón comprime las imágenes
@@ -117,3 +118,10 @@ class Frame(tk.Frame):
     def update_api(self):
         """Set the entry on normal for update the api"""
         self.entry_api.config(state='normal')
+
+
+    def open_windows_cutter_image(self):
+        """Open the main windows for cutter image"""
+
+        image_user_select = askopenfilename()
+        self.controller.open_windows_cutter_image(image_user_select)
