@@ -1,128 +1,113 @@
-from tkinter import messagebox as MessageBox
-from core.mouse_tracker import MouseTracker
-from core.directory_utils import Diretory
-from core.key_handilng import KeyHandler
+"""Module for manage the window for cutting image"""
+# pylint: disable=no-member
+
 import cv2
-
-class Editor:
-    # Initialize the Editor
-    def __init__(self):
-        self.dir_imgs = ""
-        self.path = ""
-        self.name = ""
-        self.img = ""
-        self.save_imgs = []
+from .exceptions import show_error
+from .mouse_tracker import MouseTracking
+from .key_handilng import KeyTracking
 
 
 
-    def cut_image(self):
-        # Main editor function ask and called functions
-        self._set_paths()
-        if not self.path:
-            return
-        self._load_image()
-        self._show_image_info()
-        self._show_image()
-        self._set_mouse_callback()
-        self._handle_key()
+class Image:
+    """Representing the info of image"""
+
+    def __init__(self, image_file_path):
+        self.__image_path = image_file_path
+        self.__image_color_format = None
+        self.__image_matrix = None
+        self.__image_height = None
+        self.__image_width = None
+        self.__load_image_matrix()
+        self.__set_image_dimension()
 
 
-    def _set_paths(self):
-        # Set paths or dirs importans
-        self.dir = Diretory()
-        self.path = self.dir.path_img
-        self.name = self.dir.name_img
-
-
-    def _load_image(self):
-        # Load the images for show later
+    def __load_image_matrix(self):
         try:
-            self.img = cv2.imread(self.path)
-            self.width = self.img.shape[1]
-            self.height = self.img.shape[0]
-        except Exception as e:
-            self._show_error(f"cv2.error: {e}")
+            self.__image_matrix = cv2.imread(self.__image_path)
+        except ImportError as e:
+            show_error(e)
 
 
-    def _show_image_info(self):
-        # Show if the image is out the size allowed
-        if self.img.shape[1] != 600:
-            message = f"Height: {self.height}, Width: {self.width}"
-            self._show_error(message)
+    def __set_image_dimension(self):
+        height, widht, color_format = self.__image_matrix.shape
+        self.__image_height = height
+        self.__image_width = widht
+        self.__image_color_format = color_format
 
 
-    def _show_image(self, img=None):
-        # Show the image for user
-        if img is None:
-            cv2.imshow(self.name, self.img)
-        else:
-            cv2.imshow(self.name, img)
+    @property
+    def image_path(self):
+        """give the value of private intance"""
+
+        return self.__image_path
 
 
-    def _set_mouse_callback(self):
-        # Call tack mouse for cut the image
-        self.tracker = MouseTracker(self)
-        cv2.setMouseCallback(self.name, self.tracker.main_track)
+    @property
+    def image_color_format(self):
+        """give the value of private intance"""
+
+        return self.__image_color_format
 
 
-    def _handle_key(self):
-        # Call keyboard event for save or cancel the cuts
-        KeyHandler(self)
+    @property
+    def image_matrix(self):
+        """give the value of private intance"""
+
+        return self.__image_matrix
 
 
-    def save_cuts(self, coords):
-        # Init the process for saves the cuts
-        self._process_coords(coords)
-        self._cut_image_coords(self.top, self.bot, self.right)
-        self.dir.set_dir_img()
-        self._write_cuts()
+    @property
+    def image_height(self):
+        """give the value of private intance"""
+
+        return self.__image_height
 
 
-    def _process_coords(self, coords):
-        # Process and order the coords for the cuts
-        coords = list(coords.values())
-        unpacked_coords = [
-            (coord[0][0], coord[0][1], coord[1:])
-            for coord in coords
-            ]
-        self.top, self.bot, self.right = zip(*unpacked_coords)
+    @property
+    def image_width(self):
+        """give the value of private intance"""
+
+        return self.__image_width
 
 
-    def _cut_image_coords(self, tops, bots, rights):
-        # Set the variables with the coords for cut the image
-        for top, bot, right in zip(tops, bots, rights):
-            left = 0
-            self._image_cutting(top, bot, left,right)
+
+class CutterWindowController(Image):
+    """Class that manage info of windows project and controllers"""
+
+    def __init__(self, image_file_path, project_name):
+        super().__init__(image_file_path)
+        self.__project_name = project_name
+        self.__if_loop_continues  = True
+        self.__init_cutter_window()
 
 
-    def _image_cutting(self, top, bot, left,right):
-        # Cut the image and save the matriz in a list
-        if right[0] != self.width:
-            right.append(self.width)
-
-        for right in right:
-            image_cutter = self.img[top:bot, left:right]
-            self.save_imgs.append(image_cutter)
-            left = right
+    def __init_cutter_window(self):
+        self.__show_cutter_window(self.image_matrix)
+        self.__set_mouse_key_tracking()
 
 
-    def _write_cuts(self):
-        # Save the cuts like imgfiles
-        num_cuts = len(self.save_imgs)
-        paths = self.dir.set_filesnames(num_cuts, self.name)
-
-        for path, cut in zip(paths, self.save_imgs):
-            cv2.imwrite(path, cut)
+    def __set_mouse_key_tracking(self):
+        image_matrix = self.image_matrix
+        project_name = self.project_name
+        mouse_tracking = MouseTracking(image_matrix, project_name)
+        KeyTracking(image_matrix, mouse_tracking)
 
 
-    def _handle_errors(self, func):
-        # Handle the error of functions
-        try:
-            func()
-        except cv2.error as e:
-            self._show_error(f"cv2.error: {e}")
+    def __show_cutter_window(self, image_matrix):
+        """Set and show the main window for image cutter"""
+
+        cv2.imshow(self.__project_name, image_matrix)
 
 
-    def _show_error(self, message):
-        # Show the error of functions
-        MessageBox.showwarning("Error", f"Error: {message}")
+    @property
+    def project_name(self):
+        """give the value of private intance"""
+
+        return self.__project_name
+
+
+    @property
+    def if_loop_continues(self):
+        """give the value of private intance"""
+
+        return self.__if_loop_continues
