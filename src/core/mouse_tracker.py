@@ -1,106 +1,194 @@
+"""Module for track movement and event of mouse"""
+# pylint: disable=no-member
+# pylint: disable=unused-argument
+
 import cv2
 
-class MouseTracker:
-    def __init__(self, editor_instance):
-        # Initialize the MouseTracker with an Editor instance
-        self.editor = editor_instance
-        self.img = self.editor.img.copy()
-        self.width = self.img.shape[1]
-        self.img_pos = 0
-        self.last_bottom = 0
-        self.save_cuts = []
-        self.cuts = {}
 
 
-    def main_track(self, event, eje_x, eje_y, flags, param):
-        # Main tracking function called on mouse events
+class MouseTracking:
+    """Class for tracking mouse events"""
+
+    def __init__(self, image_matrix, project_name):
+        self.__image_matrix_clean = image_matrix
+        self.__image_matrix_utility = None
+        self.__project_name = project_name
+        self.__image_matrix_width = None
+        self.__cut_area_coordinates = {}
+        self.__position_window = 0
+        self.__last_bottom = 0
+        self.__set_image_matrix_for_utility()
+        self.__set_image_matrix_width()
+        self.__init_tracking()
+
+
+    def __set_image_matrix_for_utility(self):
+        self.__image_matrix_utility = self.image_matrix_clean.copy()
+
+
+    def __set_image_matrix_width(self):
+        self.__image_matrix_width = self.image_matrix_clean.shape[1]
+
+
+    def __init_tracking(self):
+        mouse_event = self.handle_mouse_event
+        cv2.setMouseCallback(self.project_name, mouse_event)
+
+
+    def handle_mouse_event(self, event, x, y, flags, param):
+        """Select action depend on event"""
+
         if event == cv2.EVENT_MOUSEWHEEL:
-            self._handle_scroll_event(flags)
+            self.__handle_scroll_mouse(flags)
+            self.__refresh_window_image()
         elif event == cv2.EVENT_LBUTTONDOWN:
-            self._handle_left_click_event(eje_y)
+            self.__handle_left_click_event(y)
+            self.__refresh_window_image()
         elif event == cv2.EVENT_RBUTTONDOWN:
-            self._handle_right_click_event(eje_y, eje_x)
+            self.__handle_right_click_event(y, x)
+            self.__refresh_window_image()
 
 
-    def _handle_scroll_event(self, flags):
-        # Handle mouse wheel scrolling event
+    def __handle_scroll_mouse(self, flags):
         scroll_amount = 50 if flags < 0 else -50
-        self.img_pos += scroll_amount
-        self._show_image(self.img_pos, self.img)
+        if self.position_window == 0 and scroll_amount == -50:
+            return
+        self.__update_position_window (scroll_amount)
 
 
-    def _handle_left_click_event(self, click_y):
-        # Handle left mouse button click event
-        self._set_coords_area(click_y, self.width)
+    def __handle_right_click_event(self, click_y, click_x):
+        self.__set_cut_area(click_y, click_x)
+        self.__set_rectangle_area_to_draw()
+        self.__draw_reactangle_in_window()
 
 
-    def _handle_right_click_event(self, click_y, click_x):
-        # Handle right mouse button click event
-        self._set_coords_area(click_y, click_x)
+    def __handle_left_click_event(self, click_y):
+        self.__set_cut_area(click_y, self.image_matrix_width)
+        self.__set_rectangle_area_to_draw()
+        self.__draw_reactangle_in_window()
 
 
-    def _set_coords_area(self, click_y, click_x):
-        # Set rectangle size based on mouse position
-        if self._is_click_out_area(click_y):
-            self._set_hight_area(click_y)
-        self._set_widht_area(click_x)
-        self._set_size_rctngl()
+    def __update_position_window(self, updated_position):
+        self.__position_window += updated_position
 
 
-    def _set_hight_area(self, click_y):
-        # Set variables if the click is outside of rectangle
-        self.line_top = self.last_bottom
-        self.line_bottom = click_y + self.img_pos
-        self.last_bottom = self.line_bottom
-        self._set_new_cut_area()
+    def __set_cut_area(self, click_y, click_x):
+        if self.__click_is_outside_cut_area(click_y):
+            self.__set_cut_area_height(click_y)
+        self.__set_cut_area_widht(click_x)
 
 
-    def _set_widht_area(self, click_x):
-        # Set rectangle widht based on mouse position
-        self.line_left = 0
-        self.line_right = click_x
-        self.cuts[self.line_top].append(click_x)
+    def __set_cut_area_height(self, click_y):
+        self.cut_area_coordinates.update({
+                    'top': self.last_bottom,
+                    'bottom': click_y + self.position_window
+                })
+        self.__last_bottom = self.cut_area_coordinates['bottom']
 
 
-    def _is_click_out_area(self, click_y):
-        rctngl_bottom = self.last_bottom
-        click_position = click_y + self.img_pos
-
-        if click_position > rctngl_bottom:
-            return True
-
-
-    def _set_new_cut_area(self):
-        if self.line_top  not in self.cuts:
-            self.cuts[self.line_top] = []
-
-        height_cut = (self.line_top, self.line_bottom)
-        self.cuts[self.line_top].append(height_cut)
+    def __set_cut_area_widht(self, click_x):
+        self.cut_area_coordinates.update({
+            'left': 0,
+            'right': click_x
+        })
 
 
-    def _set_size_rctngl(self):
-        # Set rectangle size on a dict
-        right_bot = (self.line_right, self.line_bottom)
-        left_top = (self.line_left, self.line_top)
-        coords = {}
+    def __set_rectangle_area_to_draw(self):
+        top = self.cut_area_coordinates['top']
+        bottom = self.cut_area_coordinates['bottom']
+        left = self.cut_area_coordinates['left']
+        right = self.cut_area_coordinates['right']
 
-        coords['line_right_bot'] = right_bot
-        coords['line_left_top'] = left_top
-        self._create_rectangle(coords)
+        right_bot = (right, bottom)
+        left_top = (left, top)
+
+        self.cut_area_coordinates.update({
+            'right_bottom': right_bot,
+            'left_top': left_top
+        })
 
 
-    def _create_rectangle(self, coords):
-        # Create a green rectangle on the image
+    def __draw_reactangle_in_window(self):
         color = (251, 0, 255)
         cv2.rectangle(
-            self.img, coords['line_right_bot'],
-            coords['line_left_top'], color)
-
-        self._show_image(self.img_pos, self.img)
+            self.image_matrix_utility, self.cut_area_coordinates['right_bottom'],
+            self.cut_area_coordinates['left_top'], color)
 
 
-    def _show_image(self, position, img):
-        # Show a portion of the image based on the current position
-        pos_top = position
-        pos_bottom = position + 1080
-        self.editor._show_image(img[pos_top:pos_bottom:])
+    def __click_is_outside_cut_area(self, click_y):
+        rectangle_bottom = self.last_bottom
+        position_click = click_y + self.position_window
+        if position_click > rectangle_bottom:
+            return True
+
+        return False
+
+
+    def __refresh_window_image(self):
+        scrolled_image = self.__scroll_image()
+        cv2.imshow(self.project_name, scrolled_image)
+
+
+    def __scroll_image(self):
+        position_top = self.position_window
+        position_bottom = self.position_window + 1080
+        return self.image_matrix_utility[position_top:position_bottom]
+
+
+    def reset_image_crop(self):
+        """Reset the cut and clean image for window"""
+
+        self.__last_bottom = 0
+        self.__position_window = 0
+        self.__cut_area_coordinates.clear()
+        self.__set_image_matrix_for_utility()
+        self.__refresh_window_image()
+
+
+    @property
+    def image_matrix_clean(self):
+        """give the value of private intance"""
+
+        return self.__image_matrix_clean
+
+
+    @property
+    def image_matrix_utility(self):
+        """give the value of private intance"""
+
+        return self.__image_matrix_utility
+
+
+    @property
+    def project_name(self):
+        """give the value of private intance"""
+
+        return self.__project_name
+
+
+    @property
+    def image_matrix_width(self):
+        """give the value of private intance"""
+
+        return self.__image_matrix_width
+
+
+    @property
+    def position_window(self):
+        """give the value of private intance"""
+
+        return self.__position_window
+
+
+    @property
+    def last_bottom(self):
+        """give the value of private intance"""
+
+        return self.__last_bottom
+
+
+    @property
+    def cut_area_coordinates(self):
+        """give the value of private intance"""
+
+        return self.__cut_area_coordinates
