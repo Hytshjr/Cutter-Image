@@ -70,9 +70,11 @@ class MouseTracking:
 
 
     def __set_rectangle_area(self, click_y, click_x):
-        if self.__click_is_outside_cut_area(click_y):
+        if self.__click_to_select_new_cut_area(click_y):
             self.__set_rectangle_area_height(click_y)
-        self.__set_rectangle_area_widht(click_x)
+
+        self.__set_rectangle_area_widht(click_y, click_x)
+        self.__save_rectangle_history_area_coordinates()
 
 
     def __set_rectangle_area_height(self, click_y):
@@ -80,21 +82,22 @@ class MouseTracking:
                     'top': self.last_bottom,
                     'bottom': click_y + self.position_window
                 })
-        self.__last_bottom = self.rectangle_area_coordinates['bottom']
+        self.__last_bottom = self.__get_side_of_rectangle('bottom')
 
 
-    def __set_rectangle_area_widht(self, click_x):
-        self.rectangle_area_coordinates.update({
-            'left': 0,
-            'right': click_x
-        })
+    def __set_rectangle_area_widht(self, click_y, click_x):
+        if self.__click_to_select_new_cut_area(click_y):
+            self.__rectangle_area_coordinates['left'] = 0
+        else:
+            last_right_click = self.__get_side_of_rectangle('right')
+            self.__rectangle_area_coordinates.update({
+                'left' : last_right_click
+                })
+        self.__rectangle_area_coordinates['right'] = click_x
 
 
     def __set_rectangle_area_to_draw(self):
-        top = self.rectangle_area_coordinates['top']
-        bottom = self.rectangle_area_coordinates['bottom']
-        left = self.rectangle_area_coordinates['left']
-        right = self.rectangle_area_coordinates['right']
+        top, bottom, left, right = self.__get_side_of_rectangle()
 
         right_bot = (right, bottom)
         left_top = (left, top)
@@ -111,10 +114,10 @@ class MouseTracking:
             left_top, color)
 
 
-    def __click_is_outside_cut_area(self, click_y):
+    def __click_to_select_new_cut_area(self, click_y):
         rectangle_bottom = self.last_bottom
         position_click = click_y + self.position_window
-        if position_click > rectangle_bottom:
+        if position_click >= rectangle_bottom:
             return True
 
         return False
@@ -133,6 +136,28 @@ class MouseTracking:
         return self.image_matrix_utility[top_image:bottom_image]
 
 
+    def __get_side_of_rectangle(self, side='all'):
+        if side == 'all':
+            top = self.rectangle_area_coordinates['top']
+            bottom = self.rectangle_area_coordinates['bottom']
+            left = self.rectangle_area_coordinates['left']
+            right = self.rectangle_area_coordinates['right']
+
+            return top, bottom, left, right
+
+        return self.rectangle_area_coordinates[side]
+
+
+    def __save_rectangle_history_area_coordinates(self):
+        name_of_history = 'history_area_coordinates'
+        if name_of_history not in self.rectangle_area_coordinates:
+            self.__rectangle_area_coordinates[name_of_history] = []
+
+        self.rectangle_area_coordinates[name_of_history].append(
+            self.__get_side_of_rectangle()
+            )
+
+
     def reset_image_crop(self):
         """Reset the cut and clean image for window"""
 
@@ -141,6 +166,13 @@ class MouseTracking:
         self.__rectangle_area_coordinates.clear()
         self.__set_image_matrix_for_utility()
         self.__refresh_window_image()
+
+
+    @property
+    def rectangle_history_area_coordinates(self):
+        """give the history of cuts coordinates"""
+
+        return self.__get_side_of_rectangle('history_area_coordinates')
 
 
     @property
