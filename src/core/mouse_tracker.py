@@ -8,17 +8,22 @@ import cv2
 class MouseTracking:
     """Class for tracking mouse events"""
 
-    def __init__(self, image_matrix, project_name):
-        self.__image_matrix_clean = image_matrix
+    def __init__(self):
+        self.__image_matrix_clean = None
         self.__rectangle_area_coordinates = {}
         self.__image_matrix_utility = None
-        self.__project_name = project_name
+        self.__project_name = None
         self.__image_matrix_width = None
         self.__position_window = 0
         self.__last_bottom = 0
-        self.__set_image_matrix_for_utility()
-        self.__set_image_matrix_width()
-        self.__init_tracking()
+
+
+    def __set_project_name(self, project_name):
+        self.__project_name = project_name
+
+
+    def __set_image_matrix_clean(self, image_matrix):
+        self.__image_matrix_clean = image_matrix
 
 
     def __set_image_matrix_for_utility(self):
@@ -156,6 +161,16 @@ class MouseTracking:
         self.rectangle_area_coordinates[name_of_history].append(
             self.__get_side_of_rectangle()
             )
+
+
+    def init_tracking(self, image_matrix, project_name):
+        """init the tracking of event and movement of mouse"""
+
+        self.__set_project_name(project_name)
+        self.__set_image_matrix_clean(image_matrix)
+        self.__set_image_matrix_for_utility()
+        self.__set_image_matrix_width()
+        self.__init_tracking()
 
 
     def reset_image_crop(self):

@@ -77,19 +77,26 @@ class CutterWindowController(Image):
     def __init__(self, image_file_path, project_name):
         super().__init__(image_file_path)
         self.__project_name = project_name
+        self.__mouse_tracking = None
         self.__init_cutter_window()
 
 
     def __init_cutter_window(self):
         self.__show_cutter_window(self.image_matrix)
-        self.__set_mouse_key_tracking()
+        self.__set_mouse_tracking()
+        self.__set_key_tracking()
 
 
-    def __set_mouse_key_tracking(self):
-        image_matrix = self.image_matrix
+    def __set_mouse_tracking(self):
         project_name = self.project_name
-        mouse_tracking = MouseTracking(image_matrix, project_name)
-        KeyTracking(mouse_tracking)
+        image_matrix = self.image_matrix
+
+        self.__mouse_tracking = MouseTracking()
+        self.mouse_tracking.init_tracking(image_matrix, project_name)
+
+
+    def __set_key_tracking(self):
+        KeyTracking(self.__mouse_tracking)
 
 
     def __show_cutter_window(self, image_matrix):
@@ -103,3 +110,10 @@ class CutterWindowController(Image):
         """give the value of private intance"""
 
         return self.__project_name
+
+
+    @property
+    def mouse_tracking(self):
+        """give the value of private intance"""
+
+        return self.__mouse_tracking
