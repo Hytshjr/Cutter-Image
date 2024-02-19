@@ -39,6 +39,9 @@ class KeyTracking:
 
     def __save_image_clippings(self):
         self.cutter_window.save_image_clippings()
+        if self.cutter_window.image_cuts is None:
+            return
+
         self.__close_window()
 
 

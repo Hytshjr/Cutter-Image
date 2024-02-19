@@ -150,7 +150,10 @@ class MouseTracking:
 
             return top, bottom, left, right
 
-        return self.rectangle_area_coordinates[side]
+        try:
+            return self.rectangle_area_coordinates[side]
+        except KeyError:
+            return None
 
 
     def __save_rectangle_history_area_coordinates(self):
