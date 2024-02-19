@@ -6,8 +6,8 @@ import cv2
 class KeyTracking:
     """Handle the events of keyboard"""
 
-    def __init__(self, mouse_tracking):
-        self.__mouse_tracking = mouse_tracking
+    def __init__(self, cutter_window):
+        self.__cutter_window = cutter_window
         self.__if_loop_continues  = True
         self._init_loop()
 
@@ -20,7 +20,7 @@ class KeyTracking:
 
     def __handle_key(self, key):
         if key == ord('l') or key == ord('L'):
-            self.__clean_image()
+            self.__clean_cutter_window()
 
         elif key == 27:
             self.__cancel_clipping()
@@ -29,9 +29,8 @@ class KeyTracking:
             self.__save_image_clippings()
 
 
-    def __clean_image(self):
-        self.mouse_tracking.reset_image_crop()
-
+    def __clean_cutter_window(self):
+        self.cutter_window.clean_cutter_window()
 
 
     def __cancel_clipping(self):
@@ -39,6 +38,7 @@ class KeyTracking:
 
 
     def __save_image_clippings(self):
+        self.cutter_window.save_image_clippings()
         self.__close_window()
 
 
@@ -48,10 +48,10 @@ class KeyTracking:
 
 
     @property
-    def mouse_tracking(self):
+    def cutter_window(self):
         """give the value of private intance"""
 
-        return self.__mouse_tracking
+        return self.__cutter_window
 
 
     @property

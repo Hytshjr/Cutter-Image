@@ -1,25 +1,17 @@
-import numpy as np
+image_cuts = [(0, 309, 0, 600), (309, 472, 0, 600), (472, 598, 0, 600), (598, 738, 0, 600), (738, 781, 0, 261), (738, 781, 261, 409), (738, 781, 409, 546), (781, 853, 0, 600), (853, 894, 0, 600)]
 
-matrix = np.array([
-    [(1, 2, 3), (4, 5, 6), (7, 8, 9), (7, 8, 9), (7, 8, 9), (7, 8, 9)],
-    [(1, 2, 3), (4, 5, 6), (7, 8, 9), (7, 8, 9), (7, 8, 9), (7, 8, 9)],
-    [(1, 2, 3), (4, 5, 6), (7, 8, 9), (7, 8, 9), (7, 8, 9), (7, 8, 9)],
-    [(1, 2, 3), (4, 5, 6), (7, 8, 9), (7, 8, 9), (7, 8, 9), (7, 8, 9)],
-    [(1, 2, 3), (4, 5, 6), (7, 8, 9), (7, 8, 9), (7, 8, 9), (7, 8, 9)]
-])
+grupo_dict = {}
 
-# Divide la matriz en dos segmentos específicos
-first_segment = matrix[:, :3]  # Primeras tres columnas
-second_segment = matrix[:, 3:5]  # Resto de las columnas
+# Iterar sobre las tuplas y construir el diccionario
+for image_cut in image_cuts:
+    KEY = image_cut[0]  # La clave es una tupla con los dos primeros elementos
+    if KEY not in grupo_dict:
+        grupo_dict[KEY] = []
+        grupo_dict[KEY].append(image_cut[0])
+        grupo_dict[KEY].append(image_cut[1])
+        grupo_dict[KEY].append(image_cut[2])
+        grupo_dict[KEY].append(image_cut[3])
+    else:
+        grupo_dict[KEY].append(image_cut[3])
 
-# Convierte las matrices de nuevo a listas de Python si es necesario
-first_segment = first_segment.tolist()
-second_segment = second_segment.tolist()
-
-print(first_segment)
-print(second_segment)
-
-
-# img = self.img[self.coords['rtngl_top']:self.coords['rtngl_bottom'],self.coords['rtngl_mid']:]
-
-# cv2.imshow('test', img)
+print(grupo_dict)

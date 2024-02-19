@@ -78,6 +78,7 @@ class CutterWindowController(Image):
         super().__init__(image_file_path)
         self.__project_name = project_name
         self.__mouse_tracking = None
+        self.__image_cuts = None
         self.__init_cutter_window()
 
 
@@ -85,6 +86,12 @@ class CutterWindowController(Image):
         self.__show_cutter_window(self.image_matrix)
         self.__set_mouse_tracking()
         self.__set_key_tracking()
+
+
+    def __show_cutter_window(self, image_matrix):
+        """Set and show the main window for image cutter"""
+
+        cv2.imshow(self.__project_name, image_matrix)
 
 
     def __set_mouse_tracking(self):
@@ -96,13 +103,23 @@ class CutterWindowController(Image):
 
 
     def __set_key_tracking(self):
-        KeyTracking(self.__mouse_tracking)
+        KeyTracking(self)
 
 
-    def __show_cutter_window(self, image_matrix):
-        """Set and show the main window for image cutter"""
+    def __get_image_cuts(self):
+        return self.mouse_tracking.rectangle_history_area_coordinates
 
-        cv2.imshow(self.__project_name, image_matrix)
+
+    def clean_cutter_window(self):
+        """Clean the windows for cut image"""
+
+        self.mouse_tracking.reset_image_crop()
+
+
+    def save_image_clippings(self):
+        """Save the cuts of image coordinates"""
+
+        self.__image_cuts = self.__get_image_cuts()
 
 
     @property
@@ -117,3 +134,10 @@ class CutterWindowController(Image):
         """give the value of private intance"""
 
         return self.__mouse_tracking
+
+
+    @property
+    def image_cuts(self):
+        """give the value of private intance"""
+
+        return self.__image_cuts
