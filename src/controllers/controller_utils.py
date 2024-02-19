@@ -26,4 +26,8 @@ class Controller:
         image_file.prepare_for_a_file_format(image_path_main)
 
         cutter_windows = CutterWindowController(*image_name_project)
-        print(cutter_windows.image_cuts)
+        images_cuts = cutter_windows.image_cuts
+        cuts_amount = len(images_cuts)
+
+        path_image_cuts = image_file.gen_path_image_cuts(cuts_amount)
+

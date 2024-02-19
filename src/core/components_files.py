@@ -89,10 +89,18 @@ class ImageFile(ComponentsProject):
 
     def __init__(self, project_main_file):
         super().__init__(project_main_file)
+        self.__dir_path_save_image_cuts = None
         self.__image_file_name = None
         self.__image_file_path = None
         self.__set_image_file_name()
         self.__set_image_file_path()
+
+
+    @property
+    def dir_path_save_image_cuts(self):
+        """give the value of private intance"""
+
+        return self.__dir_path_save_image_cuts
 
 
     @property
@@ -109,6 +117,40 @@ class ImageFile(ComponentsProject):
         return self.__image_file_name
 
 
+    def gen_path_image_cuts(self, amount_image_cuts):
+        """generate the paths for save the image cuts"""
+
+        self.__make_dir_for_save_image_cuts()
+        image_cuts_paths = []
+        for image_cut_number in range(1, amount_image_cuts):
+            image_cut_name = self.__make_file_name(image_cut_number)
+            image_cut_path = self.__make_file_path(image_cut_name)
+            image_cuts_paths.append(image_cut_path)
+
+        return image_cuts_paths
+
+
+    def __make_file_name(self, cut_number):
+        project_name = self.project_name
+        project_format = self.project_format
+        return f'{project_name}_{cut_number}{project_format}'
+
+
+    def __make_file_path(self, file_name):
+        return os.path.join(self.dir_path_save_image_cuts, file_name)
+
+
+    def __make_dir_for_save_image_cuts(self):
+        dir_path = os.path.join(self.project_dir_parent_path, 'image')
+
+        try:
+            os.mkdir(dir_path)
+        except FileExistsError as e:
+            show_error(e)
+        finally:
+            self.__dir_path_save_image_cuts = dir_path
+
+
     def __set_image_file_name(self):
         image_name = self.project_name + self.project_format
         if image_name:
@@ -116,11 +158,11 @@ class ImageFile(ComponentsProject):
 
 
     def __set_image_file_path(self):
-        image_file_path = self.__create_image_path()
+        image_file_path = self.__create_file_image_path()
         self.__image_file_path = image_file_path
 
 
-    def __create_image_path(self):
+    def __create_file_image_path(self):
         parent_dir_path = self.project_dir_parent_path
         image_file_name = self.image_file_name
 
@@ -159,11 +201,11 @@ class HtmlFile(ComponentsProject):
 
 
     def __set_html_file_path(self):
-        html_file_path = self.__create_image_path()
+        html_file_path = self.__create_file_image_path()
         self.__html_file_path = html_file_path
 
 
-    def __create_image_path(self):
+    def __create_file_image_path(self):
         parent_dir_path = self.project_dir_parent_path
         html_file_name = self.html_file_name
 
