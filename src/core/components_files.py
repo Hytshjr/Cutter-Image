@@ -50,6 +50,16 @@ class ComponentsProject:
         return False
 
 
+    def prepare_for_a_file_format(self, path_new_format_file):
+        """prepare the class for some formatfile"""
+
+        old_path = self.project_main_file
+        new_path = path_new_format_file
+        rename_file(old_path=old_path, new_path=new_path)
+
+        self.update_project_main_file(path_new_format_file)
+
+
     def update_project_main_file(self, new_project_main_file):
         """update the main faile for a change path"""
 

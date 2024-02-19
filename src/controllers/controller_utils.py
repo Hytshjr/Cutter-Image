@@ -1,7 +1,7 @@
 """Controler events of buttons"""
 # pylint: disable=import-error
 
-from core.components_files import ImageFile, rename_file
+from core.components_files import ImageFile
 from core.image_handling import CutterWindowController
 from core.api_utils import save_key_api
 
@@ -21,9 +21,9 @@ class Controller:
 
         image_file = ImageFile(image_user_select)
         project_name = image_file.project_name
-        old_path = image_file.project_main_file
-        new_path = image_file.image_file_path
-        rename_file(old_path=old_path, new_path=new_path)
-        image_file.update_project_main_file(new_path)
+        image_path_main = image_file.image_file_path
+        image_name_project = (image_path_main, project_name)
+        image_file.prepare_for_a_file_format(image_path_main)
 
-        CutterWindowController(new_path, project_name)
+        cutter_windows = CutterWindowController(*image_name_project)
+        print(cutter_windows.image_cuts)
