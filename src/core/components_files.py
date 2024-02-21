@@ -122,7 +122,7 @@ class ImageFile(ComponentsProject):
 
         self.__make_dir_for_save_image_cuts()
         image_cuts_paths = []
-        for image_cut_number in range(1, amount_image_cuts):
+        for image_cut_number in range(1, amount_image_cuts+1):
             image_cut_name = self.__make_file_name(image_cut_number)
             image_cut_path = self.__make_file_path(image_cut_name)
             image_cuts_paths.append(image_cut_path)

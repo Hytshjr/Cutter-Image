@@ -124,4 +124,6 @@ class Frame(tk.Frame):
         """Open the main windows for cutter image"""
 
         image_user_select = askopenfilename()
+        if not image_user_select:
+            return
         self.controller.open_windows_cutter_image(image_user_select)
