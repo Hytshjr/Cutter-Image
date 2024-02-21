@@ -1,5 +1,6 @@
 """Module for manage the window for cutting image"""
 # pylint: disable=no-member
+# pylint: disable=catching-non-exception
 
 import cv2 as cv
 from .exceptions import show_error
@@ -7,18 +8,16 @@ from .mouse_tracker import MouseTracking
 from .key_handilng import KeyTracking
 
 
+class CutterWindowController:
+    """Class that manage info of windows project and controllers"""
 
-class Image:
-    """Representing the info of image"""
-
-    def __init__(self, image_file_path):
+    def __init__(self, image_file_path, project_name):
+        self.__image_cuts_coordinates = None
         self.__image_path = image_file_path
-        self.__image_color_format = None
+        self.__project_name = project_name
+        self.__mouse_tracking = None
         self.__image_matrix = None
-        self.__image_height = None
-        self.__image_width = None
         self.__load_image_matrix()
-        self.__set_image_dimension()
 
 
     def __load_image_matrix(self):
@@ -27,69 +26,6 @@ class Image:
             self.__image_matrix = cv.imread(path_to_find)
         except cv.error:
             show_error("Can't find the img file")
-
-
-    def __set_image_dimension(self):
-        height, widht, color_format = self.__image_matrix.shape
-        self.__image_height = height
-        self.__image_width = widht
-        self.__image_color_format = color_format
-
-
-    @property
-    def image_path(self):
-        """give the value of private intance"""
-
-        return self.__image_path
-
-
-    @property
-    def image_color_format(self):
-        """give the value of private intance"""
-
-        return self.__image_color_format
-
-
-    @property
-    def image_matrix(self):
-        """give the value of private intance"""
-
-        return self.__image_matrix
-
-
-    @property
-    def image_height(self):
-        """give the value of private intance"""
-
-        return self.__image_height
-
-
-    @property
-    def image_width(self):
-        """give the value of private intance"""
-
-        return self.__image_width
-
-
-
-class CutterWindowController(Image):
-    """Class that manage info of windows project and controllers"""
-
-    def __init__(self, image_file_path, project_name):
-        super().__init__(image_file_path)
-        self.__project_name = project_name
-        self.__mouse_tracking = None
-        self.__image_cuts_coordinates = None
-
-
-    def show_cutter_window(self):
-        """show windows for cut image"""
-
-        if self.image_matrix is None:
-            return
-        self.__show_cutter_window()
-        self.__set_mouse_tracking()
-        self.__set_key_tracking()
 
 
     def __show_cutter_window(self):
@@ -112,6 +48,16 @@ class CutterWindowController(Image):
 
     def __get_cuts_coordinates(self):
         return self.mouse_tracking.rectangle_history_area_coordinates
+
+
+    def show_cutter_window(self):
+        """show windows for cut image"""
+
+        if self.image_matrix is None:
+            return
+        self.__show_cutter_window()
+        self.__set_mouse_tracking()
+        self.__set_key_tracking()
 
 
     def clean_cutter_window(self):
@@ -145,3 +91,10 @@ class CutterWindowController(Image):
         """give the value of private intance"""
 
         return self.__image_cuts_coordinates
+
+
+    @property
+    def image_matrix(self):
+        """give the value of private intance"""
+
+        return self.__image_matrix
