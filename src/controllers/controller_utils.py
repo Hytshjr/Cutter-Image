@@ -1,9 +1,11 @@
 """Controler events of buttons"""
 # pylint: disable=import-error
 
+from core.cuts_writer import CutsWriter
 from core.components_files import ImageFile
 from core.image_handling import CutterWindowController
 from core.api_utils import save_key_api
+
 
 class Controller:
     """Class for copycharmntroller events of buttons"""
@@ -26,8 +28,14 @@ class Controller:
         image_file.prepare_for_a_file_format(image_path_main)
 
         cutter_windows = CutterWindowController(*image_name_project)
-        images_cuts = cutter_windows.image_cuts
-        cuts_amount = len(images_cuts)
+        image_matrix = cutter_windows.image_matrix
+        images_cuts_coordinates = cutter_windows.image_cuts
 
+        cut_writer = CutsWriter()
+        image_matrix_cuts = image_matrix, images_cuts_coordinates
+        cut_writer.select_cuts_image_matrix(*image_matrix_cuts)
+
+        cuts_amount = len(cut_writer.image_cuts_matrix)
         path_image_cuts = image_file.gen_path_image_cuts(cuts_amount)
+        cut_writer.save_images_cuts(path_image_cuts)
 
