@@ -10,7 +10,7 @@ from core.api_utils import save_key_api
 class Controller:
     """Class for copycharmntroller events of buttons"""
     def __init__(self):
-        pass
+        self.__img_format = ['.jpg', '.png']
 
 
     def save_key_api(self, key_api):
@@ -22,6 +22,10 @@ class Controller:
         """set the func for cut images"""
 
         image_file = ImageFile(image_user_select)
+
+        if image_file.project_format not in self.__img_format:
+            return
+
         project_name = image_file.project_name
         image_path_main = image_file.image_file_path
         image_name_project = (image_path_main, project_name)
@@ -30,6 +34,9 @@ class Controller:
         cutter_windows = CutterWindowController(*image_name_project)
         image_matrix = cutter_windows.image_matrix
         images_cuts_coordinates = cutter_windows.image_cuts
+
+        if images_cuts_coordinates is None:
+            return
 
         cut_writer = CutsWriter()
         image_matrix_cuts = image_matrix, images_cuts_coordinates
