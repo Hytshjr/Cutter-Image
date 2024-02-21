@@ -10,7 +10,37 @@ from core.api_utils import save_key_api
 class Controller:
     """Class for copycharmntroller events of buttons"""
     def __init__(self):
-        self.__img_format = ['.jpg', '.png']
+        self.__image_format = ['.jpg', '.png']
+        self.__image_file = None
+        self.__cuts_writer = None
+        self.__cutter_window = None
+
+
+    def __load_image(self, image_user_select):
+        self.__image_file = ImageFile(image_user_select)
+        return self.__image_file
+
+
+    def __start_cuts_image(self, image_file):
+        project_name = image_file.image_file_name
+        image_path_main = image_file.image_file_path
+        image_name_project = (image_path_main, project_name)
+        cutter_window = CutterWindowController(*image_name_project)
+        cutter_window.show_cutter_window()
+
+        return cutter_window
+
+
+    def __save_cuts_image(self, cutter_window, image_file):
+        image_matrix = cutter_window.image_matrix
+        image_cuts = cutter_window.image_cuts_coordinates
+        image_matrix_cuts = (image_matrix, image_cuts)
+        cuts_writer = CutsWriter()
+        cuts_writer.select_cuts_image_matrix(*image_matrix_cuts)
+
+        cuts_amount = len(cuts_writer.image_cuts_matrix)
+        path_image_cuts = image_file.gen_path_image_cuts(cuts_amount)
+        cuts_writer.save_images_cuts(path_image_cuts)
 
 
     def save_key_api(self, key_api):
@@ -21,27 +51,34 @@ class Controller:
     def open_windows_cutter_image(self, image_user_select):
         """set the func for cut images"""
 
-        image_file = ImageFile(image_user_select)
-        if image_file.project_format not in self.__img_format:
-            return
+        image_file = self.__load_image(image_user_select)
+        cutter_window = self.__start_cuts_image(image_file)
+        self.__save_cuts_image(cutter_window, image_file)
 
-        project_name = image_file.project_name
-        image_path_main = image_file.image_file_path
-        image_file.prepare_for_a_file_format(image_path_main)
 
-        image_name_project = (image_path_main, project_name)
-        cutter_windows = CutterWindowController(*image_name_project)
-        cutter_windows.show_cutter_window()
-        image_cuts_coordinates = cutter_windows.image_cuts_coordinates
-        if image_cuts_coordinates is None:
-            return
+    @property
+    def image_format(self):
+        """give the value of private intance"""
 
-        cut_writer = CutsWriter()
-        image_matrix = cutter_windows.image_matrix
-        image_matrix_cuts = image_matrix, image_cuts_coordinates
-        cut_writer.select_cuts_image_matrix(*image_matrix_cuts)
+        return self.__image_format
 
-        cuts_amount = len(cut_writer.image_cuts_matrix)
-        path_image_cuts = image_file.gen_path_image_cuts(cuts_amount)
-        cut_writer.save_images_cuts(path_image_cuts)
 
+    @property
+    def image_file(self):
+        """give the value of private intance"""
+
+        return self.__image_file
+
+
+    @property
+    def cuts_writer(self):
+        """give the value of private intance"""
+
+        return self.__cuts_writer
+
+
+    @property
+    def cutter_window(self):
+        """give the value of private intance"""
+
+        return self.__cutter_window
