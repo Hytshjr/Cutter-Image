@@ -17,7 +17,7 @@ class CutsWriter:
 
 
     def __set_image_cuts_coodinates(self, cuts_coordinates):
-        self.__images_cuts_coordinates = cuts_coordinates
+        self.__images_cuts_coordinates = cuts_coordinates.copy()
 
 
     def __add_coordinate_last_cut(self, coordinate, index):
@@ -29,6 +29,7 @@ class CutsWriter:
 
     def __process_coordinates(self, cuts_coordinates, widht_matrix):
         cuts_amount = len(cuts_coordinates)
+        cuts_amount_added = 0
 
         for index in range(cuts_amount):
             new_height_cut = cuts_coordinates[index][2]
@@ -39,8 +40,10 @@ class CutsWriter:
                 bottom = previous_cut[1]
                 right = previous_cut[3]
                 if right != widht_matrix:
+                    index += cuts_amount_added
                     coordinate = (top, bottom, right, widht_matrix)
                     self.__add_coordinate_last_cut(coordinate, index)
+                    cuts_amount_added += 1
 
 
     def select_cuts_image_matrix(self, image_matrix, cuts_coordinates):
