@@ -1,7 +1,7 @@
 """Module for manage the window for cutting image"""
 # pylint: disable=no-member
 
-import cv2
+import cv2 as cv
 from .exceptions import show_error
 from .mouse_tracker import MouseTracking
 from .key_handilng import KeyTracking
@@ -23,9 +23,10 @@ class Image:
 
     def __load_image_matrix(self):
         try:
-            self.__image_matrix = cv2.imread(self.__image_path)
-        except ImportError as e:
-            show_error(e)
+            path_to_find = cv.samples.findFile(self.__image_path)
+            self.__image_matrix = cv.imread(path_to_find)
+        except cv.error:
+            show_error("Can't find the img file")
 
 
     def __set_image_dimension(self):
@@ -78,20 +79,23 @@ class CutterWindowController(Image):
         super().__init__(image_file_path)
         self.__project_name = project_name
         self.__mouse_tracking = None
-        self.__image_cuts = None
-        self.__init_cutter_window()
+        self.__image_cuts_coordinates = None
 
 
-    def __init_cutter_window(self):
-        self.__show_cutter_window(self.image_matrix)
+    def show_cutter_window(self):
+        """show windows for cut image"""
+
+        if self.image_matrix is None:
+            return
+        self.__show_cutter_window()
         self.__set_mouse_tracking()
         self.__set_key_tracking()
 
 
-    def __show_cutter_window(self, image_matrix):
+    def __show_cutter_window(self):
         """Set and show the main window for image cutter"""
 
-        cv2.imshow(self.__project_name, image_matrix)
+        cv.imshow(self.__project_name, self.image_matrix)
 
 
     def __set_mouse_tracking(self):
@@ -106,7 +110,7 @@ class CutterWindowController(Image):
         KeyTracking(self)
 
 
-    def __get_image_cuts(self):
+    def __get_cuts_coordinates(self):
         return self.mouse_tracking.rectangle_history_area_coordinates
 
 
@@ -119,7 +123,7 @@ class CutterWindowController(Image):
     def save_image_clippings(self):
         """Save the cuts of image coordinates"""
 
-        self.__image_cuts = self.__get_image_cuts()
+        self.__image_cuts_coordinates = self.__get_cuts_coordinates()
 
 
     @property
@@ -137,7 +141,7 @@ class CutterWindowController(Image):
 
 
     @property
-    def image_cuts(self):
+    def image_cuts_coordinates(self):
         """give the value of private intance"""
 
-        return self.__image_cuts
+        return self.__image_cuts_coordinates

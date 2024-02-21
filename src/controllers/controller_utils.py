@@ -22,24 +22,23 @@ class Controller:
         """set the func for cut images"""
 
         image_file = ImageFile(image_user_select)
-
         if image_file.project_format not in self.__img_format:
             return
 
         project_name = image_file.project_name
         image_path_main = image_file.image_file_path
-        image_name_project = (image_path_main, project_name)
         image_file.prepare_for_a_file_format(image_path_main)
 
+        image_name_project = (image_path_main, project_name)
         cutter_windows = CutterWindowController(*image_name_project)
-        image_matrix = cutter_windows.image_matrix
-        images_cuts_coordinates = cutter_windows.image_cuts
-
-        if images_cuts_coordinates is None:
+        cutter_windows.show_cutter_window()
+        image_cuts_coordinates = cutter_windows.image_cuts_coordinates
+        if image_cuts_coordinates is None:
             return
 
         cut_writer = CutsWriter()
-        image_matrix_cuts = image_matrix, images_cuts_coordinates
+        image_matrix = cutter_windows.image_matrix
+        image_matrix_cuts = image_matrix, image_cuts_coordinates
         cut_writer.select_cuts_image_matrix(*image_matrix_cuts)
 
         cuts_amount = len(cut_writer.image_cuts_matrix)
