@@ -4,28 +4,27 @@
 
 import cv2 as cv
 from .exceptions import show_error
-from .mouse_tracker import MouseTracking
 from .key_handilng import KeyTracking
+from .mouse_tracker import MouseTracking
 
 
 class CutterWindowController:
     """Class that manage info of windows project and controllers"""
 
-    def __init__(self, image_file_path, project_name):
+    def __init__(self, project_name):
         self.__image_cuts_coordinates = None
-        self.__image_path = image_file_path
         self.__project_name = project_name
         self.__mouse_tracking = None
         self.__image_matrix = None
-        self.__load_image_matrix()
 
 
-    def __load_image_matrix(self):
+    def __load_image_matrix(self, image_path_main):
         try:
-            path_to_find = cv.samples.findFile(self.__image_path)
+            path_to_find = cv.samples.findFile(image_path_main)
             self.__image_matrix = cv.imread(path_to_find)
         except cv.error:
-            show_error("Can't find the img file")
+            error = "Can't find the image file"
+            show_error(error, image_path_main)
 
 
     def __show_cutter_window(self):
@@ -50,9 +49,41 @@ class CutterWindowController:
         return self.mouse_tracking.rectangle_history_area_coordinates
 
 
-    def show_cutter_window(self):
+    def __complete_selected_cuts(self, cuts_coordinates):
+        widht_matrix = self.image_matrix.shape[1]
+        cuts_coordinates = cuts_coordinates.copy()
+        self.__process_coordinates(cuts_coordinates, widht_matrix)
+
+
+    def __process_coordinates(self, cuts_coordinates, widht_matrix):
+        cuts_amount_added = 0
+
+        for index in range(self.image_cuts_amount):
+            new_height_cut = cuts_coordinates[index][2]
+            previous_cut = cuts_coordinates[index - 1]
+
+            if new_height_cut == 0:
+                top = previous_cut[0]
+                bottom = previous_cut[1]
+                right = previous_cut[3]
+                if right != widht_matrix:
+                    index += cuts_amount_added
+                    coordinate = (top, bottom, right, widht_matrix)
+                    self.__add_coordinate_last_cut(coordinate, index)
+                    cuts_amount_added += 1
+
+
+    def __add_coordinate_last_cut(self, coordinate, index):
+        if index == 0:
+            self.image_cuts_coordinates.append(coordinate)
+        else:
+            self.image_cuts_coordinates.insert(index, coordinate)
+
+
+    def show_cutter_window(self, image_path_main):
         """show windows for cut image"""
 
+        self.__load_image_matrix(image_path_main)
         if self.image_matrix is None:
             return
         self.__show_cutter_window()
@@ -61,15 +92,23 @@ class CutterWindowController:
 
 
     def clean_cutter_window(self):
-        """Clean the windows for cut image"""
+        """Clean the windows for cut image for key 'L' """
 
         self.mouse_tracking.reset_image_crop()
 
 
     def save_image_clippings(self):
-        """Save the cuts of image coordinates"""
+        """Save the cuts of image coordinates for key 'S' """
 
         self.__image_cuts_coordinates = self.__get_cuts_coordinates()
+        self.__complete_selected_cuts(self.image_cuts_coordinates)
+
+
+    @property
+    def image_cuts_amount(self):
+        """give the amount of cuts on image"""
+
+        return len(self.__image_cuts_coordinates)
 
 
     @property
