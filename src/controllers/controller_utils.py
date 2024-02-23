@@ -5,6 +5,7 @@ from core.cuts_writer import CutsWriter
 from core.components_files import ImageFile
 from core.image_handling import CutterWindowController
 from core.api_utils import save_key_api
+from interface.views.html_window import HtmlEntrys
 
 
 class Controller:
@@ -56,6 +57,19 @@ class Controller:
             return
         cutter_window = self.__start_cuts_image(image_file)
         self.__save_cuts_image(cutter_window, image_file)
+
+
+    def window_cutter_file_html(self, image_user_select):
+        """set the func for cut images and create html file"""
+        image_file = self.__load_image(image_user_select, True)
+        if image_file.project_format not in self.image_format:
+            return
+        cutter_window = self.__start_cuts_image(image_file)
+        self.__save_cuts_image(cutter_window, image_file)
+
+        cuts_amount = cutter_window.image_cuts_amount
+        html_window = HtmlEntrys(cuts_amount)
+        html_window.init_windows()
 
 
     @property

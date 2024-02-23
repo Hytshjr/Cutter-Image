@@ -89,7 +89,7 @@ class Frame(tk.Frame):
         button_cut_compress.grid(row=5, column=0, pady=3, columnspan=2)
 
         # Este botón hace el proceso de corte y compresión y crea el HTML
-        button_cut_html = tk.Button(self, text='Corte y hacer HTML', **self.button_config)
+        button_cut_html = tk.Button(self, text='Corte y hacer HTML', **self.button_config, command=self.window_cutter_file_html)
         button_cut_html.grid(row=6, column=0, pady=3, columnspan=2)
 
 
@@ -127,3 +127,12 @@ class Frame(tk.Frame):
         if not image_user_select:
             return
         self.controller.open_windows_cutter_image(image_user_select)
+
+
+    def window_cutter_file_html(self):
+        """Open the main windows for cutter image to create html file"""
+
+        image_user_select = askopenfilename()
+        if not image_user_select:
+            return
+        self.controller.window_cutter_file_html(image_user_select)
