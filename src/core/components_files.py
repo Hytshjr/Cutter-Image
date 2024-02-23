@@ -86,49 +86,25 @@ class ImageFile(ComponentsProject):
         self.__set__dir_path_save_image_cuts()
 
 
-    def __set_image_file_name(self):
-        os.path.split(self.__image_file_path)
-        image_file_name = os.path.split(self.__image_file_path)[1]
-        image_name = os.path.splitext(image_file_name)[0]
+    @property
+    def dir_path_save_image_cuts(self):
+        """give the value of private intance"""
 
-        if image_file_name:
-            self.__image_file_name = image_name
+        return self.__dir_path_save_image_cuts
 
 
-    def __set__dir_path_save_image_cuts(self):
-        name_dir = (self.project_dir_parent_path, 'image')
-        self.__dir_path_save_image_cuts = os.path.join(*name_dir)
+    @property
+    def image_file_path(self):
+        """give the value of private intance"""
+
+        return self.__image_file_path
 
 
-    def __make_dir_for_save_image_cuts(self):
-        try:
-            os.mkdir(self.__dir_path_save_image_cuts)
-        except FileExistsError as e:
-            show_error(e)
+    @property
+    def image_file_name(self):
+        """give the value of private intance"""
 
-
-    def __make_file_name(self, cut_number):
-        project_name = self.image_file_name
-        project_format = self.project_format
-        return f'{project_name}_{cut_number}{project_format}'
-
-
-    def __make_file_path(self, file_name):
-        return os.path.join(self.dir_path_save_image_cuts, file_name)
-
-
-    def __create_env_file_image_path(self):
-        parent_dir_path = self.project_dir_parent_path
-        image_file_name = self.project_name + self.project_format
-
-        return os.path.join(parent_dir_path, image_file_name)
-
-
-    def __rename_image_file(self):
-        old_path = self.image_file_path
-        new_path = self.__create_env_file_image_path()
-        rename_file(old_path=old_path, new_path=new_path)
-        return new_path
+        return self.__image_file_name
 
 
     def init_env_project(self):
@@ -158,25 +134,50 @@ class ImageFile(ComponentsProject):
         return image_cuts_paths
 
 
-    @property
-    def dir_path_save_image_cuts(self):
-        """give the value of private intance"""
+    def __set_image_file_name(self):
+        os.path.split(self.__image_file_path)
+        image_file_name = os.path.split(self.__image_file_path)[1]
+        image_name = os.path.splitext(image_file_name)[0]
 
-        return self.__dir_path_save_image_cuts
-
-
-    @property
-    def image_file_path(self):
-        """give the value of private intance"""
-
-        return self.__image_file_path
+        if image_file_name:
+            self.__image_file_name = image_name
 
 
-    @property
-    def image_file_name(self):
-        """give the value of private intance"""
+    def __set__dir_path_save_image_cuts(self):
+        name_dir = (self.project_dir_parent_path, 'image')
+        self.__dir_path_save_image_cuts = os.path.join(*name_dir)
 
-        return self.__image_file_name
+
+    def __make_dir_for_save_image_cuts(self):
+        try:
+            os.mkdir(self.__dir_path_save_image_cuts)
+        except FileExistsError:
+            pass
+
+
+    def __make_file_name(self, cut_number):
+        project_name = self.image_file_name
+        project_format = self.project_format
+        return f'{project_name}_{cut_number}{project_format}'
+
+
+    def __make_file_path(self, file_name):
+        return os.path.join(self.dir_path_save_image_cuts, file_name)
+
+
+    def __create_env_file_image_path(self):
+        parent_dir_path = self.project_dir_parent_path
+        image_file_name = self.project_name + self.project_format
+
+        return os.path.join(parent_dir_path, image_file_name)
+
+
+    def __rename_image_file(self):
+        old_path = self.image_file_path
+        new_path = self.__create_env_file_image_path()
+        rename_file(old_path=old_path, new_path=new_path)
+        return new_path
+
 
 
 class HtmlFile(ComponentsProject):
