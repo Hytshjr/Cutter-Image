@@ -3,11 +3,11 @@
 
 import os
 import fileinput
-from config import CORE_ROOT
+from config import BASE_DIR
 
 def save_key_api(key_api):
     """Save the api key on env file."""
-    env_path = os.path.join(CORE_ROOT, '.env')
+    env_path = os.path.join(BASE_DIR, '.env')
     option = 'API_KEY'
 
     with fileinput.FileInput(env_path, inplace=True) as file:
