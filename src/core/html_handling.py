@@ -1,50 +1,97 @@
-# from config import MEDIA_ROOT
+# pylint: disable=import-error
+
+import os
+from config import TEMPLATE_ROOT
 from jinja2 import Environment, FileSystemLoader
 
 
 class HtmlMaker:
-    def __init__(self):
-        self.path_template = ""
-        self.name_file = ""
-        self.path_file = ""
-        self.data = {}
+    """Class for make the html file with link images and legals"""
+
+    def __init__(self, dir_parent_path, project_name):
+        self.__dir_parent_path = dir_parent_path
+        self.__project_name = project_name
+        self.__templates_path = None
+        self.__html_template = None
+        self.__map_items = None
+        self.__html_items = {}
+        self.__set_path_template()
 
 
-    def html_maker(self):
-        self._set_env_jinja()
-        self._set_template()
-        self._render_template()
-        self._write_html()
+    def __set_html_file_path(self):
+        html_file_name = self.__project_name + '.html'
+        return os.path.join(self.__dir_parent_path, html_file_name)
 
 
-    def _set_env_jinja(self):
-        file_system = FileSystemLoader(self.path_template)
-        template_env = Environment(loader=file_system)
-        self.template_env = template_env
+    def __set_path_template(self):
+        self.__templates_path = TEMPLATE_ROOT
 
 
-    def _set_template(self):
-        template = 'add_img.html'
-        self.template = self.template_env.get_template(template)
+    def __mapping_items(self, items):
+        if self.__map_items is None:
+            return items
+
+        mapped_items = []
+        index = 0
+        for amount in self.__map_items:
+            try:
+                if amount == 1:
+                    mapped_items.append(items[index])
+                else:
+                    mapped_items.append(items[index:index + amount])
+                index += amount
+            except IndexError:
+                if items[index:]==[]:
+                    break
+                mapped_items.append(items[index:])
+        return mapped_items
 
 
-    def _render_template(self):
-        self.output = self.template.render(self.data)
+    def __process_items_for_html_file(self, data):
+
+        items_1, items_2, items_3 = data
+        items_1 = self.__mapping_items(items_1)
+
+        context = {
+            'url_img':items_1,
+            'url_web':items_2,
+            'legals':items_3,
+            'title':self.__project_name,
+        }
+        self.__html_items = context
 
 
-    def _write_html(self):
-        with open(self.path_file, 'w') as archivo_salida:
-            archivo_salida.write(self.output)
+    def __set_config_jinja(self):
+        template = 'add_elements.html'
+        file_system = FileSystemLoader(self.__templates_path)
+        jinja_environment = Environment(loader=file_system)
+
+        self.__html_template = jinja_environment.get_template(template)
 
 
-def run():
-    # Create window
-    html = HtmlMaker()
-    html.path_template = 'D://Tottus_App//resources//html'
-    html.name_file = "test_html.html"
-    html.path_file = 'D://Tottus_App//resources//html//test_html.html'
-    html.data['list_png'] = [1,2,[3,4],5,[6,7,8],9]
-    html.html_maker()
+    def __render_html_with_items(self):
+        rendered_html = self.__html_template.render(self.__html_items)
+        return rendered_html
 
-if __name__ == "__main__":
-    run()
+
+    def __save_html_file(self):
+        rendered_html = self.__render_html_with_items()
+        html_file_path = self.__set_html_file_path()
+        output_file = open(html_file_path, 'w', encoding='UTF8')
+        output_file.write(rendered_html)
+        output_file.close()
+
+
+    def make_html_file(self, data):
+        """Make the html file for the images"""
+
+        self.__process_items_for_html_file(data)
+        self.__set_config_jinja()
+        self.__render_html_with_items()
+        self.__save_html_file()
+
+
+    def map_items_html(self, map_items):
+        """Recive a map for the items on html file"""
+
+        self.__map_items = map_items
