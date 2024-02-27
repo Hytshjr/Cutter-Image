@@ -6,6 +6,7 @@ from core.api_utils import save_key_api
 from core.cuts_writer import CutsWriter
 from core.html_handling import HtmlMaker
 from core.components_files import ImageFile
+from core.image_compress import CompressImage
 from core.image_handling import CutterWindowController
 from interface.views.html_window import HtmlEntrys
 
@@ -81,6 +82,12 @@ class Controller:
         html_window.init_windows()
 
 
+    def __compress_image(self, image_file):
+        compress_image = CompressImage()
+        dir_to_compress = image_file.dir_path_save_image_cuts
+        compress_image.compress_images_directory(dir_to_compress)
+
+
     def save_key_api(self, key_api):
         """call func from core for save api key"""
 
@@ -105,5 +112,6 @@ class Controller:
             return
         cutter_window = self.__start_cuts_image(image_file)
         self.__save_cuts_image(cutter_window, image_file)
+        self.__compress_image(image_file)
         html_maker = self.__load_html_file_maker(cutter_window, image_file)
         self.__load_window_for_make_html(cutter_window, html_maker)
