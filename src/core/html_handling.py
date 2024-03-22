@@ -1,8 +1,8 @@
 # pylint: disable=import-error
 
 import os
-from config import TEMPLATE_ROOT
 from jinja2 import Environment, FileSystemLoader
+from config import TEMPLATE_ROOT
 
 
 class HtmlMaker:
@@ -27,34 +27,33 @@ class HtmlMaker:
         self.__templates_path = TEMPLATE_ROOT
 
 
-    def __mapping_items(self, items):
+    def __mapping_items(self, items_img, items_web):
         if self.__map_items is None:
-            return items
+            return (items_img, items_web)
 
         mapped_items = []
         index = 0
         for amount in self.__map_items:
             try:
                 if amount == 1:
-                    mapped_items.append(items[index])
+                    mapped_items.append((items_img[index], items_web[index]))
                 else:
-                    mapped_items.append(items[index:index + amount])
+                    mapped_items.append((items_img[index:index + amount], items_web[index:index + amount]))
                 index += amount
             except IndexError:
-                if items[index:]==[]:
+                if items_img[index:]==[]:
                     break
-                mapped_items.append(items[index:])
+                mapped_items.append((items_img[index:], items_web[index:]))
         return mapped_items
 
 
     def __process_items_for_html_file(self, data):
 
         items_1, items_2, items_3 = data
-        items_1 = self.__mapping_items(items_1)
+        url_mappings = self.__mapping_items(items_1, items_2)
 
         context = {
-            'url_img':items_1,
-            'url_web':items_2,
+            'url_img_web':url_mappings,
             'legals':items_3,
             'title':self.__project_name,
         }
@@ -65,6 +64,7 @@ class HtmlMaker:
         template = 'add_elements.html'
         file_system = FileSystemLoader(self.__templates_path)
         jinja_environment = Environment(loader=file_system)
+        jinja_environment.globals.update(zip=zip)
 
         self.__html_template = jinja_environment.get_template(template)
 
