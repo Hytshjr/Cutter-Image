@@ -48,16 +48,24 @@ class HtmlMaker:
 
 
     def __process_items_for_html_file(self, data):
-
         items_1, items_2, items_3 = data
         url_mappings = self.__mapping_items(items_1, items_2)
 
         context = {
-            'url_img_web':url_mappings,
-            'legals':items_3,
+            'url_img_web':self.__clean_html_items(url_mappings),
+            'legals':self.__clean_html_items(items_3),
             'title':self.__project_name,
         }
         self.__html_items = context
+
+
+    def __clean_html_items(self, datos):
+        datos_filtrados = []
+        for tupla in datos:
+            if not all(elemento == '' for elemento in tupla):
+                datos_filtrados.append(tupla)
+
+        return datos_filtrados
 
 
     def __set_config_jinja(self):

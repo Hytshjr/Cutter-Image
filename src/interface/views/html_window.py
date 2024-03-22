@@ -147,8 +147,7 @@ class HtmlEntrys:
         list_user_input_cleaned = []
         for user_input in list_user_input:
             value = user_input.get()
-            if value != "":
-                list_user_input_cleaned.append(value)
+            list_user_input_cleaned.append(value)
 
         return list_user_input_cleaned
 
